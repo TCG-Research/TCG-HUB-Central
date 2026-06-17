@@ -717,8 +717,10 @@ const SAFRA_CORES = { 2019: "#888780", 2020: "#185FA5", 2021: "#534AB7", 2022: "
 let safraCat = "Todas";
 let safrasSel = new Set([2025, 2024, 2023]);
 let safraMedia = true;
+let safraModo = "acum"; // "acum" = acumulado | "var" = variação m/m pura
 function serieSafra(cat, am) {
   const vs = (S.varSafra[cat] && S.varSafra[cat][am]) ? S.varSafra[cat][am] : {};
+  if (safraModo === "var") return S.tabs.map((tab) => vs[tab] != null ? +(vs[tab] * 100).toFixed(2) : null);
   let acc = 0, ativo = false; const pts = [];
   for (const tab of S.tabs) { if (vs[tab] != null) { ativo = true; acc += vs[tab]; } pts.push(ativo ? +(acc * 100).toFixed(2) : null); }
   return pts;
@@ -731,12 +733,16 @@ function renderSafrasSel() {
   const cont = document.getElementById("safrasSel"); if (!cont) return;
   const bOn = "padding:3px 11px;font-size:12px;border:1px solid #1f9d55;background:#1f9d55;color:#fff;border-radius:6px;cursor:pointer;font-weight:600";
   const bOff = "padding:3px 11px;font-size:12px;border:1px solid #bbb;background:#fff;color:#666;border-radius:6px;cursor:pointer";
-  let h = '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px"><span class="hint" style="margin-right:2px">Categoria:</span>';
+  let h = '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px"><span class="hint" style="margin-right:2px">Visão:</span>';
+  h += `<button data-modo="acum" style="${safraModo === "acum" ? bOn : bOff}">Acumulado</button>`;
+  h += `<button data-modo="var" style="${safraModo === "var" ? bOn : bOff}">Variação m/m</button>`;
+  h += '</div><div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px"><span class="hint" style="margin-right:2px">Categoria:</span>';
   for (const g of S.grupos) h += `<button data-cat="${g}" style="${safraCat === g ? bOn : bOff}">${g}</button>`;
   h += '</div><div style="display:flex;flex-wrap:wrap;gap:5px 14px;align-items:center"><span class="hint" style="margin-right:2px">Safras:</span>';
   for (const am of S.anos) { const c = SAFRA_CORES[am] || "#888"; h += `<label style="display:inline-flex;align-items:center;gap:4px;font-size:12.5px;cursor:pointer"><input type="checkbox" data-am="${am}" ${safrasSel.has(am) ? "checked" : ""}><span style="color:${c};font-weight:500">${am}</span></label>`; }
   h += `<label style="display:inline-flex;align-items:center;gap:4px;font-size:12.5px;cursor:pointer;margin-left:8px;border-left:1px solid #ddd;padding-left:10px"><input type="checkbox" data-media="1" ${safraMedia ? "checked" : ""}><span style="font-weight:600">Média (25/24/23)</span></label></div>`;
   cont.innerHTML = h;
+  cont.querySelectorAll("button[data-modo]").forEach((b) => b.addEventListener("click", () => { safraModo = b.dataset.modo; renderSafrasSel(); renderSafras(); }));
   cont.querySelectorAll("button[data-cat]").forEach((b) => b.addEventListener("click", () => { safraCat = b.dataset.cat; renderSafrasSel(); renderSafras(); }));
   cont.querySelectorAll("input[data-am]").forEach((cb) => cb.addEventListener("change", () => { const am = +cb.dataset.am; if (cb.checked) safrasSel.add(am); else safrasSel.delete(am); renderSafras(); }));
   cont.querySelectorAll("input[data-media]").forEach((cb) => cb.addEventListener("change", () => { safraMedia = cb.checked; renderSafras(); }));
@@ -758,12 +764,15 @@ function renderSafras() {
       },
       scales: {
         x: { ticks: { color: CG.tick, maxRotation: 60, autoSkip: true, maxTicksLimit: 14 }, grid: { color: CG.grid } },
-        y: { title: { display: true, text: "variação de preço acumulada (%)", color: CG.tick }, ticks: { color: CG.tick, callback: (v) => (v > 0 ? "+" : "") + v + "%" }, grid: { color: CG.grid } },
+        y: { title: { display: true, text: safraModo === "var" ? "variação de preço no mês (%)" : "variação de preço acumulada (%)", color: CG.tick }, ticks: { color: CG.tick, callback: (v) => (v > 0 ? "+" : "") + v + "%" }, grid: { color: CG.grid } },
       },
     },
   });
   const nota = document.getElementById("safrasNota");
-  if (nota) nota.innerHTML = `<b>Como ler:</b> cada linha é um <b>ano-modelo</b> (safra) seguido mês a mês — sempre o mesmo carro, então a virada de ano não cria degrau. O eixo é a <b>variação de preço acumulada</b> desde que a safra aparece (negativo = depreciou; positivo = valorizou — as safras 2019-2020 subiram na pandemia). Categoria <b>${safraCat}</b>, ponderado pelo volume do mix da frota.`;
+  const txtModo = safraModo === "var"
+    ? `O eixo é a <b>variação de preço de cada mês isolado</b> (a depreciação/valorização daquele mês, sem acumular).`
+    : `O eixo é a <b>variação de preço acumulada</b> desde que a safra aparece (negativo = depreciou; positivo = valorizou — as safras 2019-2020 subiram na pandemia).`;
+  if (nota) nota.innerHTML = `<b>Como ler:</b> cada linha é um <b>ano-modelo</b> (safra) seguido mês a mês — sempre o mesmo carro, então a virada de ano não cria degrau. ${txtModo} Categoria <b>${safraCat}</b>, ponderado pelo volume do mix da frota.`;
 }
 function renderFrotas() {
   renderSafrasSel();
