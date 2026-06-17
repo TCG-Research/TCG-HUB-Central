@@ -181,10 +181,11 @@
   <div class="sec" id="sec-frotas">
     <!-- ===== Variação de preço por safra (ano-modelo) ===== -->
     <div class="card full" style="margin-top:16px;border:2px solid #1f9d55">
-      <h2 style="color:#1f9d55">Sazonalidade da depreciação — frota Localiza</h2>
-      <p>Variação de preço da frota de seminovos por <b>mês do ano</b>; cada linha é um <b>ano calendário</b>. Permite comparar "como foi cada mês" entre os anos. Variação casada por ano-modelo (<b>sem degrau de virada de ano</b>), ponderada pelo volume do mix.</p>
+      <h2 style="color:#1f9d55">Variação de preço por safra — ano-modelo</h2>
+      <p>Cada linha é um <b>ano-modelo</b> da frota Localiza, seguido mês a mês ao longo do tempo (sempre o mesmo carro → <b>sem degrau de virada de ano</b>). Passe o mouse pra ver a <b>média móvel de 3 meses</b> da variação — mostra se a depreciação está acelerando ou aliviando na ponta.</p>
       <div id="safrasSel" style="margin:8px 0 12px"></div>
-      <div class="chartbox" style="height:430px"><canvas id="cSafras"></canvas></div>
+      <div id="safrasChartWrap" class="chartbox" style="height:430px"><canvas id="cSafras"></canvas></div>
+      <div id="safrasTabela" style="display:none;overflow-x:auto"></div>
       <p class="hint" id="safrasNota" style="margin-top:10px;line-height:1.5"></p>
     </div>
 
@@ -273,6 +274,7 @@
             <select id="modModo">
               <option value="evolucao">Evolução de 1 modelo (0 / 1 / 2 / 3 anos)</option>
               <option value="comparar">Comparar modelos</option>
+              <option value="safra">Variação por safra (ano-modelo)</option>
             </select>
           </div>
           <div class="ctl" id="ctlIdade"><label>Idade</label>
@@ -283,7 +285,7 @@
               <option value="3">3 anos</option>
             </select>
           </div>
-          <div class="ctl"><label>Eixo</label>
+          <div class="ctl" id="ctlEixo"><label>Eixo</label>
             <select id="eixoMod">
               <option value="rs">R$ (valor)</option>
               <option value="100">Base 100</option>
@@ -711,74 +713,145 @@ function renderKiller() {
   document.getElementById("killerNota").innerHTML =
     `<b>Metodologia:</b> deterioração do valor residual (gap = 1 − preço seminovo / preço 0&nbsp;km, no mesmo mês — sem inflação) da <b>carteira de seminovos de 1 a 3 anos</b> da frota Localiza. A variação mensal é medida <b>casando o mesmo ano-modelo</b> entre meses consecutivos (acompanha o mesmo carro envelhecendo, ex.: ano-modelo 2025 em jun vs mai), o que <b>elimina a quebra da virada de ano</b> da FIPE. Índice <b>encadeado</b> desde jan/2023, ponderado pelo volume da frota. A linha cinza é o que a Localiza reportou no release 2T24; a marca em ago/2025 é o corte de IPI Verde (carros 1.0).`;
 }
-// ===== GRÁFICO DE SAFRAS (ano-modelo) =====
+// ===== GRÁFICO DE SAFRAS (linha = ano-modelo, eixo = tempo) =====
 const S = D.frotas.safras;
-const ANO_CORES = { 2019: "#888780", 2020: "#185FA5", 2021: "#9a8c2a", 2022: "#1D9E75", 2023: "#BA7517", 2024: "#D85A30", 2025: "#A32D2D", 2026: "#D4537E" };
-const MES_LAB3 = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
-const MES_NUM = { janeiro: 1, fevereiro: 2, marco: 3, abril: 4, maio: 5, junho: 6, julho: 7, agosto: 8, setembro: 9, outubro: 10, novembro: 11, dezembro: 12 };
-const _semAcMes = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
-const ANOS_CAL = [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
-const tabDeAnoMes = {}; // "ano-mes" -> codigo_tabela
-(MESES || []).forEach((x) => { const m = (x.mes || "").trim(); const [nome, ano] = m.split("/"); const mn = MES_NUM[_semAcMes(nome || "")]; if (mn) tabDeAnoMes[ano + "-" + mn] = x.codigo_tabela; });
+const SAFRA_CORES = { 2019: "#7f7f7f", 2020: "#17becf", 2021: "#9467bd", 2022: "#2ca02c", 2023: "#1f77b4", 2024: "#ff7f0e", 2025: "#d62728", 2026: "#e377c2" };
 let safraCat = "Todas";
-let anosSel = new Set([2024, 2025, 2026]);
-let safraModo = "var"; // "var" = variação m/m | "acum" = acumulado no ano
-let safraMedia = false;
-function valMesFrota(cat, ano, m) { const tab = tabDeAnoMes[ano + "-" + m]; if (tab == null) return null; const v = S.varFrota[cat] ? S.varFrota[cat][tab] : null; return v == null ? null : v * 100; }
-function serieAno(cat, ano) {
-  const pts = []; let acc = 0, ativo = false;
-  for (let m = 1; m <= 12; m++) {
-    const v = valMesFrota(cat, ano, m);
-    if (safraModo === "acum") { if (v != null) { acc += v; ativo = true; } pts.push(ativo ? +acc.toFixed(2) : null); }
-    else pts.push(v == null ? null : +v.toFixed(2));
-  }
+let safrasSel = new Set([2025, 2024, 2023]);
+let safraMedia = true;
+let safraModo = "acum"; // "acum" = acumulado | "var" = variação suavizada (média móvel 3m)
+let safraVis = "grafico"; // "grafico" | "tabela"
+let safraMeses = S.tabs.length; // período mostrado (nº de meses)
+let safraIni = 0; // índice global do 1º mês visível (p/ o tooltip)
+const mesLabSafra = (tab) => { const m = ((MESES.find((x) => x.codigo_tabela === tab) || {}).mes || "").trim(); const [n, a] = m.split("/"); return n ? n.slice(0, 3) + "/" + a.slice(2) : ""; };
+const varCru = (cat, am, tab) => { const v = (S.varSafra[cat] && S.varSafra[cat][am]) ? S.varSafra[cat][am][tab] : null; return v == null ? null : +(v * 100).toFixed(2); };
+function serieSafra(cat, am) {
+  // Variação: linha = média móvel 3m (suave). Acumulado: soma encadeada.
+  if (safraModo === "var") return S.tabs.map((_, i) => mm3Safra(cat, am, i));
+  const vs = (S.varSafra[cat] && S.varSafra[cat][am]) ? S.varSafra[cat][am] : {};
+  let acc = 0, ativo = false; const pts = [];
+  for (const tab of S.tabs) { if (vs[tab] != null) { ativo = true; acc += vs[tab]; } pts.push(ativo ? +(acc * 100).toFixed(2) : null); }
   return pts;
 }
-function serieMediaSazonal(cat) {
-  return MES_LAB3.map((_, i) => { const m = i + 1; const vals = ANOS_CAL.map((y) => valMesFrota(cat, y, m)).filter((x) => x != null); return vals.length ? +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : null; });
+function serieMediaSafra(cat) {
+  const base = [2025, 2024, 2023].map((am) => serieSafra(cat, am));
+  return S.tabs.map((_, i) => { const vals = base.map((s) => s[i]).filter((x) => x != null); return vals.length ? +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : null; });
+}
+// média móvel 3m da VARIAÇÃO m/m até o índice global gIdx -> tendência na ponta
+function mm3Safra(cat, am, gIdx) {
+  const vs = (S.varSafra[cat] && S.varSafra[cat][am]) ? S.varSafra[cat][am] : null; if (!vs) return null;
+  const arr = [];
+  for (let k = gIdx; k > gIdx - 3 && k >= 0; k--) { const v = vs[S.tabs[k]]; if (v != null) arr.push(v); }
+  return arr.length ? +((arr.reduce((a, b) => a + b, 0) / arr.length) * 100).toFixed(2) : null;
+}
+function mm3Media(cat, gIdx) {
+  const ms = [2025, 2024, 2023].map((am) => mm3Safra(cat, am, gIdx)).filter((x) => x != null);
+  return ms.length ? +(ms.reduce((a, b) => a + b, 0) / ms.length).toFixed(2) : null;
 }
 function renderSafrasSel() {
   const cont = document.getElementById("safrasSel"); if (!cont) return;
   const bOn = "padding:3px 11px;font-size:12px;border:1px solid #1f9d55;background:#1f9d55;color:#fff;border-radius:6px;cursor:pointer;font-weight:600";
   const bOff = "padding:3px 11px;font-size:12px;border:1px solid #bbb;background:#fff;color:#666;border-radius:6px;cursor:pointer";
-  let h = '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px"><span class="hint" style="margin-right:2px">Visão:</span>';
-  h += `<button data-modo="var" style="${safraModo === "var" ? bOn : bOff}">Variação m/m</button>`;
-  h += `<button data-modo="acum" style="${safraModo === "acum" ? bOn : bOff}">Acumulado no ano</button>`;
+  let h = '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px"><span class="hint" style="margin-right:2px">Ver:</span>';
+  h += `<button data-vis="grafico" style="${safraVis === "grafico" ? bOn : bOff}">Gráfico</button>`;
+  h += `<button data-vis="tabela" style="${safraVis === "tabela" ? bOn : bOff}">Tabela resumo</button>`;
+  h += '<span class="hint" style="margin:0 4px 0 10px">Visão:</span>';
+  h += `<button data-modo="acum" style="${safraModo === "acum" ? bOn : bOff}">Acumulado</button>`;
+  h += `<button data-modo="var" style="${safraModo === "var" ? bOn : bOff}">Variação (suave 3m)</button>`;
   h += '</div><div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px"><span class="hint" style="margin-right:2px">Categoria:</span>';
   for (const g of S.grupos) h += `<button data-cat="${g}" style="${safraCat === g ? bOn : bOff}">${g}</button>`;
-  h += '</div><div style="display:flex;flex-wrap:wrap;gap:5px 14px;align-items:center"><span class="hint" style="margin-right:2px">Anos:</span>';
-  for (const y of ANOS_CAL) { const c = ANO_CORES[y] || "#888"; h += `<label style="display:inline-flex;align-items:center;gap:4px;font-size:12.5px;cursor:pointer"><input type="checkbox" data-ano="${y}" ${anosSel.has(y) ? "checked" : ""}><span style="color:${c};font-weight:500">${y}</span></label>`; }
-  h += `<label style="display:inline-flex;align-items:center;gap:4px;font-size:12.5px;cursor:pointer;margin-left:8px;border-left:1px solid #ddd;padding-left:10px"><input type="checkbox" data-media="1" ${safraMedia ? "checked" : ""}><span style="font-weight:600">Média (perfil típico)</span></label></div>`;
+  h += '</div><div style="display:flex;flex-wrap:wrap;gap:5px 14px;align-items:center"><span class="hint" style="margin-right:2px">Safras (ano-modelo):</span>';
+  for (const am of S.anos) { const c = SAFRA_CORES[am] || "#888"; h += `<label style="display:inline-flex;align-items:center;gap:4px;font-size:12.5px;cursor:pointer"><input type="checkbox" data-am="${am}" ${safrasSel.has(am) ? "checked" : ""}><span style="color:${c};font-weight:500">${am}</span></label>`; }
+  h += `<label style="display:inline-flex;align-items:center;gap:4px;font-size:12.5px;cursor:pointer;margin-left:8px;border-left:1px solid #ddd;padding-left:10px"><input type="checkbox" data-media="1" ${safraMedia ? "checked" : ""}><span style="font-weight:600">Média (25/24/23)</span></label></div>`;
+  h += `<div style="display:flex;align-items:center;gap:10px;margin-top:10px"><span class="hint" style="white-space:nowrap">Período:</span><input type="range" id="safraRange" min="6" max="${S.tabs.length}" value="${Math.min(safraMeses, S.tabs.length)}" step="1" style="flex:1;max-width:360px"><span class="hint" id="safraRangeLab" style="white-space:nowrap"></span></div>`;
   cont.innerHTML = h;
+  cont.querySelectorAll("button[data-vis]").forEach((b) => b.addEventListener("click", () => { safraVis = b.dataset.vis; renderSafrasSel(); renderSafras(); }));
   cont.querySelectorAll("button[data-modo]").forEach((b) => b.addEventListener("click", () => { safraModo = b.dataset.modo; renderSafrasSel(); renderSafras(); }));
   cont.querySelectorAll("button[data-cat]").forEach((b) => b.addEventListener("click", () => { safraCat = b.dataset.cat; renderSafrasSel(); renderSafras(); }));
-  cont.querySelectorAll("input[data-ano]").forEach((cb) => cb.addEventListener("change", () => { const y = +cb.dataset.ano; if (cb.checked) anosSel.add(y); else anosSel.delete(y); renderSafras(); }));
+  cont.querySelectorAll("input[data-am]").forEach((cb) => cb.addEventListener("change", () => { const am = +cb.dataset.am; if (cb.checked) safrasSel.add(am); else safrasSel.delete(am); renderSafras(); }));
   cont.querySelectorAll("input[data-media]").forEach((cb) => cb.addEventListener("change", () => { safraMedia = cb.checked; renderSafras(); }));
+  const rng = cont.querySelector("#safraRange");
+  if (rng) rng.addEventListener("input", () => { safraMeses = +rng.value; atualizaLabelPeriodo(); renderSafras(); });
+  atualizaLabelPeriodo();
+}
+function atualizaLabelPeriodo() {
+  const lab = document.getElementById("safraRangeLab"); if (!lab) return;
+  const total = S.tabs.length, N = Math.min(safraMeses, total), ini = total - N;
+  lab.textContent = `${N} meses  (${mesLabSafra(S.tabs[ini])} → ${mesLabSafra(S.tabs[total - 1])})`;
+}
+const mediaCruMes = (cat, gIdx) => { const vals = [2025, 2024, 2023].map((am) => varCru(cat, am, S.tabs[gIdx])).filter((x) => x != null); return vals.length ? +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : null; };
+function atualizaNotaSafras() {
+  const nota = document.getElementById("safrasNota"); if (!nota) return;
+  const txtModo = safraModo === "var"
+    ? `Na visão <b>Variação</b>, a linha é a <b>média móvel de 3 meses</b> (suaviza o ruído) — passe o mouse pra ver também o dado cru do mês.`
+    : `Na visão <b>Acumulado</b>, é a variação de preço acumulada de cada safra (negativo = depreciou; positivo = valorizou — as safras 2019-2020 subiram na pandemia).`;
+  nota.innerHTML = `<b>Como ler:</b> cada linha é um <b>ano-modelo</b> seguido mês a mês ao longo do tempo (mesmo após o ano de modelo), sempre o mesmo carro → sem degrau de virada de ano. ${txtModo} A média móvel de 3 meses mostra se a depreciação está <b>acelerando ou aliviando na ponta</b>. Categoria <b>${safraCat}</b>, ponderado pelo volume do mix.`;
 }
 function renderSafras() {
+  const wrap = document.getElementById("safrasChartWrap"), tabEl = document.getElementById("safrasTabela");
+  if (safraVis === "tabela") { if (wrap) wrap.style.display = "none"; if (tabEl) tabEl.style.display = "block"; renderSafrasTabela(); atualizaNotaSafras(); return; }
+  if (wrap) wrap.style.display = ""; if (tabEl) tabEl.style.display = "none";
+  const total = S.tabs.length, N = Math.min(safraMeses, total), ini = total - N;
+  safraIni = ini;
+  const labels = S.tabs.slice(ini).map(mesLabSafra);
+  const corta = (serie) => {
+    let sub = serie.slice(ini);
+    if (safraModo === "acum") { const base = sub.find((x) => x != null); if (base != null) sub = sub.map((x) => x == null ? null : +(x - base).toFixed(2)); }
+    return sub;
+  };
   const ds = [];
-  for (const y of ANOS_CAL) if (anosSel.has(y)) ds.push({ label: String(y), data: serieAno(safraCat, y), borderColor: ANO_CORES[y] || "#888", backgroundColor: ANO_CORES[y] || "#888", borderWidth: 2.2, pointRadius: 2, tension: .2, spanGaps: false });
-  if (safraMedia) ds.push({ label: "Média (típico)", data: serieMediaSazonal(safraCat), borderColor: "#111", backgroundColor: "#111", borderWidth: 3, borderDash: [6, 3], pointRadius: 0, tension: .2, spanGaps: false });
+  for (const am of S.anos) if (safrasSel.has(am)) ds.push({ label: String(am), _am: am, data: corta(serieSafra(safraCat, am)), borderColor: SAFRA_CORES[am] || "#888", backgroundColor: SAFRA_CORES[am] || "#888", borderWidth: 2.2, pointRadius: 0, tension: .25, spanGaps: false });
+  if (safraMedia) ds.push({ label: "Média 25/24/23", _media: true, data: corta(serieMediaSafra(safraCat)), borderColor: "#111", backgroundColor: "#111", borderWidth: 3, borderDash: [6, 3], pointRadius: 0, tension: .25, spanGaps: false });
   if (charts.cSafras) charts.cSafras.destroy();
   charts.cSafras = new Chart(document.getElementById("cSafras"), {
-    type: "line", data: { labels: MES_LAB3, datasets: ds },
+    type: "line", data: { labels, datasets: ds },
     options: {
       responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
       plugins: {
         legend: { position: "bottom", labels: { color: CG.legend, boxWidth: 14, font: { size: 11 } } },
-        tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${c.parsed.y == null ? "" : (c.parsed.y >= 0 ? "+" : "") + c.parsed.y.toFixed(1).replace(".", ",") + "%"}` } },
+        tooltip: { callbacks: { label: (c) => {
+          const gIdx = safraIni + c.dataIndex;
+          if (safraModo === "var") {
+            const ln = c.parsed.y == null ? "—" : (c.parsed.y >= 0 ? "+" : "") + c.parsed.y.toFixed(2).replace(".", ",") + "%/mês";
+            const cru = c.dataset._am != null ? varCru(safraCat, c.dataset._am, S.tabs[gIdx]) : (c.dataset._media ? mediaCruMes(safraCat, gIdx) : null);
+            const cruStr = cru == null ? "" : `   ·  mês: ${(cru >= 0 ? "+" : "") + cru.toFixed(2).replace(".", ",")}%`;
+            return `${c.dataset.label}: ${ln} (méd 3m)${cruStr}`;
+          }
+          const val = c.parsed.y == null ? "—" : (c.parsed.y >= 0 ? "+" : "") + c.parsed.y.toFixed(1).replace(".", ",") + "%";
+          const mm = c.dataset._am != null ? mm3Safra(safraCat, c.dataset._am, gIdx) : (c.dataset._media ? mm3Media(safraCat, gIdx) : null);
+          const mmStr = mm == null ? "" : `   ·  méd 3m: ${(mm >= 0 ? "+" : "") + mm.toFixed(2).replace(".", ",")}%/mês`;
+          return `${c.dataset.label}: ${val}${mmStr}`;
+        } } },
       },
       scales: {
-        x: { ticks: { color: CG.tick }, grid: { color: CG.grid } },
-        y: { title: { display: true, text: safraModo === "var" ? "variação de preço no mês (%)" : "acumulado no ano (%)", color: CG.tick }, ticks: { color: CG.tick, callback: (v) => (v > 0 ? "+" : "") + v + "%" }, grid: { color: CG.grid } },
+        x: { ticks: { color: CG.tick, maxRotation: 60, autoSkip: true, maxTicksLimit: 14 }, grid: { color: CG.grid } },
+        y: { title: { display: true, text: safraModo === "var" ? "variação m/m suavizada (méd 3m, %)" : "variação de preço acumulada (%)", color: CG.tick }, ticks: { color: CG.tick, callback: (v) => (v > 0 ? "+" : "") + v + "%" }, grid: { color: CG.grid } },
       },
     },
   });
-  const nota = document.getElementById("safrasNota");
-  const txtModo = safraModo === "var"
-    ? `Cada ponto é a <b>variação de preço da frota naquele mês</b> (ex.: o ponto de "mar" na linha 2024 = quanto a frota variou em março de 2024).`
-    : `Cada linha <b>acumula</b> a variação de janeiro até o mês, dentro do próprio ano.`;
-  if (nota) nota.innerHTML = `<b>Como ler:</b> eixo = meses do ano; cada linha é um <b>ano calendário</b>. ${txtModo} Dá pra comparar a <b>sazonalidade</b> — "como foi cada mês" entre os anos. Variação casada por ano-modelo (sem degrau de virada de ano), carteira de seminovos de 1-3 anos, categoria <b>${safraCat}</b>, ponderado pelo volume do mix.`;
+  atualizaNotaSafras();
+}
+function renderSafrasTabela() {
+  const cont = document.getElementById("safrasTabela"); if (!cont) return;
+  const total = S.tabs.length, N = Math.min(safraMeses, total), ult = total - 1;
+  const nCols = Math.min(N, 12);
+  const idxCols = []; for (let g = total - nCols; g < total; g++) idxCols.push(g);
+  const linhas = [];
+  for (const am of S.anos) if (safrasSel.has(am)) linhas.push({ label: String(am), cor: SAFRA_CORES[am] || "#888", am });
+  if (safraMedia) linhas.push({ label: "Média 25/24/23", cor: "#111", media: true });
+  const HL = "background:rgba(31,157,85,.14);border-left:2px solid rgba(31,157,85,.55);";
+  const cel = (v, extra) => { const cor = v == null ? "#aaa" : (v < 0 ? "#c0392b" : (v > 0 ? "#1f9d55" : "#666")); const txt = v == null ? "—" : (v >= 0 ? "+" : "") + v.toFixed(1).replace(".", ",") + "%"; return `<td style="text-align:right;padding:4px 9px;color:${cor};${extra || ""}">${txt}</td>`; };
+  let h = `<table class="mod-tab" style="font-size:12.5px;white-space:nowrap"><thead><tr><th style="text-align:left">Safra <span class="hint">(variação % no mês)</span></th>`;
+  idxCols.forEach((g) => { h += `<th style="text-align:right;padding:4px 9px">${mesLabSafra(S.tabs[g])}</th>`; });
+  h += `<th style="text-align:right;padding:4px 9px;${HL}font-weight:700">méd 3m</th></tr></thead><tbody>`;
+  for (const ln of linhas) {
+    h += `<tr><td style="text-align:left"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${ln.cor};margin-right:6px"></span>${ln.label}</td>`;
+    idxCols.forEach((g) => { const v = ln.media ? mediaCruMes(safraCat, g) : varCru(safraCat, ln.am, S.tabs[g]); h += cel(v); });
+    const m3 = ln.media ? mm3Media(safraCat, ult) : mm3Safra(safraCat, ln.am, ult);
+    h += cel(m3, HL + "font-weight:700");
+    h += "</tr>";
+  }
+  cont.innerHTML = h + "</tbody></table>";
 }
 function renderFrotas() {
   renderSafrasSel();
@@ -904,9 +977,17 @@ function renderModTabela(mods) {
   mods.forEach((m) => { const nv = m.novo[L]; h += `<tr><td><b>${m.nameplate}</b> <span class="hint">${m.marca.split(" ")[0]}</span></td><td>${rsCheio(nv)}</td><td>${rsCheio(m.a1[L])}</td><td>${gapStr(m.a1[L], nv)}</td><td>${rsCheio(m.a2[L])}</td><td>${gapStr(m.a2[L], nv)}</td><td>${rsCheio(m.a3[L])}</td><td>${gapStr(m.a3[L], nv)}</td></tr>`; });
   el.innerHTML = h + "</tbody></table>";
 }
+const SM = D.safras_modelo;
+function serieSafraModelo(np, am) { // variação acumulada de preço da safra, alinhada a MESES
+  const vs = (SM.varSafra[np] && SM.varSafra[np][am]) ? SM.varSafra[np][am] : {};
+  let acc = 0, ativo = false; const pts = [];
+  for (const mz of MESES) { const v = vs[mz.codigo_tabela]; if (v != null) { ativo = true; acc += v; } pts.push(ativo ? +(acc * 100).toFixed(2) : null); }
+  return pts;
+}
+const Wacum = (datasets) => datasets.map((d) => { const sl = winSlice(d.data); const base = sl.find((v) => v != null); return { ...d, data: base != null ? sl.map((v) => v == null ? null : +(v - base).toFixed(2)) : sl }; });
 function renderModelo() {
   renderModChips();
-  const modo = document.getElementById("modModo").value; // evolucao | comparar
+  const modo = document.getElementById("modModo").value; // evolucao | comparar | safra
   const idade = document.getElementById("idadeMod").value;
   const eixo = document.getElementById("eixoMod").value;
   const trims = document.getElementById("trimsMod").checked;
@@ -914,6 +995,20 @@ function renderModelo() {
   const ind = eixo === "100", gap = eixo === "gap";
   document.getElementById("ctlIdade").style.display = modo === "comparar" ? "" : "none";
   document.getElementById("ckTrims").style.display = modo === "comparar" ? "" : "none";
+  document.getElementById("ctlEixo").style.display = modo === "safra" ? "none" : "";
+  if (modo === "safra") {
+    const mods0 = selMod.map((n) => D.por_modelo.find((m) => m.nameplate === n)).filter(Boolean);
+    renderModKpis(mods0); renderModTabela(mods0);
+    if (!mods0.length) { hint.textContent = "Selecione um modelo no painel à esquerda."; if (charts.cModelo) { charts.cModelo.destroy(); charts.cModelo = null; } return; }
+    const m = mods0[0];
+    hint.innerHTML = `<b>${m.nameplate}</b> (${m.marca}) — variação de preço <b>acumulada</b> de cada <b>ano-modelo</b> (safra), seguido mês a mês. Mesma lógica do gráfico da frota Localiza: sempre o mesmo carro, sem degrau de virada de ano.${mods0.length > 1 ? " Usa o 1º selecionado." : ""}`;
+    const dsS = [];
+    for (const am of [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019]) { const s = serieSafraModelo(m.nameplate, am); if (s.some((x) => x != null)) dsS.push({ label: String(am), data: s, borderColor: SAFRA_CORES[am] || "#888", backgroundColor: SAFRA_CORES[am] || "#888", borderWidth: 2, pointRadius: 0, tension: .2, spanGaps: false }); }
+    const pf = (v) => v == null ? "" : (v > 0 ? "+" : "") + v.toFixed(0) + "%";
+    const pt = (v) => v == null ? "" : (v > 0 ? "+" : "") + v.toFixed(1).replace(".", ",") + "%";
+    mkChart("cModelo", "line", Wacum(dsS), winLabels(), pf, "variação de preço acumulada (%)", pt);
+    return;
+  }
   const gapArr = (obj, key) => obj[key].map((v, i) => (v != null && obj.novo[i]) ? +(((1 - v / obj.novo[i])) * 100).toFixed(1) : null);
   const serie = (obj, key) => (gap ? gapArr(obj, key) : ind ? indexar100(obj[key]) : obj[key].slice());
   const mods = selMod.map((n) => D.por_modelo.find((m) => m.nameplate === n)).filter(Boolean);
