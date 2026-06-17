@@ -627,7 +627,7 @@
   // ============================================================
   // NOTICIAS - vem do news.json do TransCap News (auto refresh)
   // URL do JSON publico:
-  const NEWS_URL = "https://ibbatcg-rgb.github.io/transcap-news/news.json";
+  const NEWS_URL = "https://TCG-Research.github.io/transcap-news/news.json";
   // Mapeamento de setor -> tag visual no painel
   const SECTOR_TAG_MAP = {
     rental: "rental",
@@ -694,7 +694,7 @@
       console.warn("Falha ao buscar news.json:", e);
       const el = document.getElementById("news-list");
       if(el && !NEWS.length) {
-        el.innerHTML = '<div style="padding:18px;text-align:center;color:#888;font-size:.78rem;">Nao foi possivel carregar as noticias.<br><a href="https://ibbatcg-rgb.github.io/transcap-news/" target="_blank" style="color:#FF6200">Abrir TransCap News &rarr;</a></div>';
+        el.innerHTML = '<div style="padding:18px;text-align:center;color:#888;font-size:.78rem;">Nao foi possivel carregar as noticias.<br><a href="https://TCG-Research.github.io/transcap-news/" target="_blank" style="color:#FF6200">Abrir TransCap News &rarr;</a></div>';
       }
     }
   }
@@ -767,7 +767,7 @@
     const el = document.getElementById('news-list');
     if(!NEWS.length){
       el.innerHTML = newsLoaded
-        ? '<div style="padding:18px;text-align:center;color:#888;font-size:.78rem;">Sem notícias nas últimas 24h.<br><a href="https://ibbatcg-rgb.github.io/transcap-news/" target="_blank" style="color:#FF6200">Ver feed completo &rarr;</a></div>'
+        ? '<div style="padding:18px;text-align:center;color:#888;font-size:.78rem;">Sem notícias nas últimas 24h.<br><a href="https://TCG-Research.github.io/transcap-news/" target="_blank" style="color:#FF6200">Ver feed completo &rarr;</a></div>'
         : '<div style="padding:18px;text-align:center;color:#888;font-size:.8rem;">Carregando noticias...</div>';
       return;
     }
