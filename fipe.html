@@ -179,14 +179,12 @@
 
   <!-- ABA: FROTAS (Localiza x Movida) -->
   <div class="sec" id="sec-frotas">
-    <!-- ===== KILLER CHART: réplica do benchmark Localiza (2T24) ===== -->
+    <!-- ===== Depreciação Seminovos Localiza (carteira casada por ano-modelo) ===== -->
     <div class="card full" style="margin-top:16px;border:2px solid #1f9d55">
-      <h2 style="color:#1f9d55">📉 Killer chart — deterioração do valor residual (réplica Localiza 2T24)</h2>
-      <p>Deterioração do valor residual (gap vs 0 km) da frota Localiza desde jan/2023 — <span style="color:#1f9d55"><b>nosso (FIPE)</b></span> × <span style="color:#888"><b>Localiza reportado</b></span>. <b>Duas leituras</b>: <i>carteira de seminovos</i> (variação casada por ano-modelo, sem quebra de janeiro — bate os −11,2% deles) e <i>réplica fiel</i> (trava o trim básico). Alterne nos botões e monte a cesta abaixo.</p>
-      <div id="killerSel" style="margin:6px 0 12px"></div>
+      <h2 style="color:#1f9d55">Depreciação Seminovos Localiza</h2>
+      <p>Deterioração do valor residual (gap vs 0&nbsp;km) da carteira de seminovos da frota Localiza desde jan/2023 — <span style="color:#1f9d55"><b>nosso (FIPE)</b></span> × <span style="color:#888"><b>Localiza reportado (2T24)</b></span>.</p>
       <div class="chartbox" style="height:400px"><canvas id="cKillerAcum"></canvas></div>
-      <p class="hint" id="killerNota" style="margin-top:8px;line-height:1.5"></p>
-      <div id="killerTabela" style="margin:12px 0 0;overflow-x:auto"></div>
+      <p class="hint" id="killerNota" style="margin-top:10px;line-height:1.5"></p>
     </div>
 
     <p class="hint" style="margin:18px 0 0">Depreciação <b>restrita aos modelos que cada locadora mais roda</b> (frota típica). Fonte da frota: seminovos mais vendidos no site de cada uma.</p>
@@ -616,24 +614,7 @@ function renderKillerSel() {
   }));
 }
 function renderKiller() {
-  // --- tabela comparativa nosso x Localiza (gap por fase) ---
-  const fmt = (v) => v == null ? "—" : v.toFixed(1).replace(".", ",") + "%";
-  let h = `<table class="mod-tab"><thead><tr><th>Gap por fase</th><th>Pré '19-20</th><th>Pandemia</th><th>Pós '23-24</th><th>Δ 2019→2024</th></tr></thead><tbody>`;
-  for (const i of [1, 2, 3]) {
-    const s = killerSerieIdade(i);
-    const med = FASES.map((anos) => meanArr(s.filter((p) => anos.includes(p.ano)).map((p) => p.gap)));
-    const a19 = meanArr(s.filter((p) => p.ano === 2019).map((p) => p.gap)), a24 = meanArr(s.filter((p) => p.ano === 2024).map((p) => p.gap));
-    const dl = (a19 != null && a24 != null) ? a24 - a19 : null;
-    const loc = LOC_FASES[i];
-    h += `<tr><td><b>${LBL_IDADE[i]}</b></td>` +
-      `<td>${fmt(med[0])} <span class="hint">(Loc ${loc[0]}%)</span></td>` +
-      `<td>${fmt(med[1])} <span class="hint">(Loc ${loc[1]}%)</span></td>` +
-      `<td>${fmt(med[2])} <span class="hint">(Loc ${loc[2]}%)</span></td>` +
-      `<td><b style="color:#1f9d55">${dl == null ? "—" : (dl >= 0 ? "+" : "") + fmt(dl)}</b> <span class="hint">(Loc +${LOC_DELTA[i]}pp)</span></td></tr>`;
-  }
-  document.getElementById("killerTabela").innerHTML = h + "</tbody></table>";
-
-  // --- KILLER: acumulado desde jan/2023, com períodos e ponta marcada ---
+  // --- acumulado desde jan/2023, com períodos e ponta marcada ---
   const comp = killerComposto();
   const iBase = comp.findIndex((p) => p.mes === LOC_ACUM_INI);
   const win = iBase >= 0 ? comp.slice(iBase) : comp;
@@ -712,10 +693,9 @@ function renderKiller() {
             const it = items.find((x) => x.datasetIndex === 0); // nossa linha
             if (!it) return "";
             const i = it.dataIndex, d = it.dataset.data;
-            const cob = ns[i] != null ? `\nCobertura: ${ns[i]} modelo${ns[i] === 1 ? "" : "s"}${ns[i] <= 1 ? " ⚠" : ""}` : "";
-            if (i < 1 || d[i] == null || d[i - 1] == null) return cob.trim();
+            if (i < 1 || d[i] == null || d[i - 1] == null) return "";
             const mom = d[i] - d[i - 1];
-            return `Depreciação no mês: ${mom <= 0 ? "▼ " : "▲ "}${Math.abs(mom).toFixed(1).replace(".", ",")} p.p.${cob}`;
+            return `Depreciação no mês: ${mom <= 0 ? "▼ " : "▲ "}${Math.abs(mom).toFixed(1).replace(".", ",")} p.p.`;
           },
         } },
       },
@@ -727,20 +707,10 @@ function renderKiller() {
     plugins: [killerPlugin],
   });
 
-  const nossoJun24 = (ours[LOC_ACUM.length - 1]).toFixed(1).replace(".", ",");
-  const hojeV = ours.at(-1), hojeStr = (hojeV >= 0 ? "+" : "") + hojeV.toFixed(1).replace(".", ",") + "%";
-  const piorV = Math.min(...ours), piorStr = piorV.toFixed(1).replace(".", ",") + "%";
-  const nb = killerSel.size;
-  const nMin = Math.min(...ns.slice(findIdx("dezembro/2023") < 0 ? 0 : findIdx("dezembro/2023"))); // cobertura na 2ª metade
-  const notaFixo =
-    `<b>Leitura 1 — réplica fiel ("travando os modelos"):</b> para cada modelo, <b>trava-se o trim básico</b> (Onix Joy, Kwid Life, Argo 1.0…) e segue-se a depreciação dele vs 0&nbsp;km, acumulada desde jan/23 (idade inteira, composto 1/2/3 anos) — exatamente o que a Localiza fez. Com a cesta atual (${nb} modelos) o gap chega a <b>${nossoJun24}%</b> em jun/24, <b>colado nos −11,2% reportados</b>. <b style="color:#c0392b">Ressalva:</b> o trim básico vai saindo de linha na FIPE e a <b>cobertura cai</b> (chega a ${nMin <= 1 ? "<b>1 modelo</b>" : nMin + " modelos"} — passe o mouse); por isso a curva vai <b>até dez/2025</b> (em 2026 sobra ~1 trim isolado, não comparável). Para a dinâmica recente, use a <b>cesta variável</b>.`;
-  const notaVar =
-    `<b>Leitura 2 — carteira de seminovos (1-3 anos) da frota RENT:</b> mede a variação mensal do gap (vs 0&nbsp;km) <b>casando o mesmo ano-modelo</b> entre meses consecutivos — acompanha <b>o mesmo carro envelhecendo</b> (AM 2025 em jun vs AM 2025 em mai), nunca troca de ano-modelo numa transição, então <b>não há quebra de janeiro</b> (salto residual ~0,5pp, vs +8% no método ingênuo). Encadeado, frota completa, <b>ponderado pelo volume do mix</b>, cobertura cheia até a ponta. Resultado: <b>${nossoJun24}%</b> em jun/24 — <b>colado nos −11,2% da Localiza</b> — seguindo a <b>${hojeStr}</b> hoje. Gap relativo, sem inflação (razão no mesmo mês).`;
   document.getElementById("killerNota").innerHTML =
-    (killerMet === "var" ? notaVar : notaFixo) + ` <span class="hint">Pior ponto: ${piorStr}. Alterne a leitura e monte a cesta nos botões acima.</span>`;
+    `<b>Metodologia:</b> deterioração do valor residual (gap = 1 − preço seminovo / preço 0&nbsp;km, no mesmo mês — sem inflação) da <b>carteira de seminovos de 1 a 3 anos</b> da frota Localiza. A variação mensal é medida <b>casando o mesmo ano-modelo</b> entre meses consecutivos (acompanha o mesmo carro envelhecendo, ex.: ano-modelo 2025 em jun vs mai), o que <b>elimina a quebra da virada de ano</b> da FIPE. Índice <b>encadeado</b> desde jan/2023, ponderado pelo volume da frota. A linha cinza é o que a Localiza reportou no release 2T24; a marca em ago/2025 é o corte de IPI Verde (carros 1.0).`;
 }
 function renderFrotas() {
-  renderKillerSel();
   renderKiller();
   const F = D.frotas;
   const empSel = document.getElementById("frEmpresa").value;
