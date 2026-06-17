@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Transportation and Capital Goods Hub</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="setores_news.js"></script>
 <script src="acoes.js"></script>
 <script src="precos.js"></script>
@@ -374,11 +373,6 @@
 </head>
 <body>
 
-<script>
-  const SUPABASE_URL  = "https://guzoripmdqclgxrllfvj.supabase.co";
-  const SUPABASE_ANON = "sb_publishable_rN8qCD-VFePFYx9yqtswGg_Rc1DWQgR";
-</script>
-
 <div id="gate" style="
   position:fixed;inset:0;z-index:9999;background:#000;
   display:none;align-items:center;justify-content:center;
@@ -409,7 +403,7 @@
 <div id="app" style="display:block">
 
 <script>
-  // ===== PREVIEW LOCAL: login desativado (no hub de verdade, mantenha o Supabase) =====
+  // ===== Hub aberto (sem login) =====
   function doLogin(){ showApp(); }
   function doLogout(){ location.reload(); }
   function showApp(){
