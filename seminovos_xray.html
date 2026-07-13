@@ -91,12 +91,7 @@ td.pos{color:var(--green);font-weight:700}td.neg{color:var(--red);font-weight:70
 </div>
 
 <div class="sec"><h2>Mix da frota</h2>
-<div class="sub">Quem são esses veículos — por <b>categoria</b>, <b>marca</b>, <b>modelo</b>, <b>quilometragem</b> e <b>ano-modelo</b>. <span class="pill l">Localiza</span> à esquerda, <span class="pill m">Movida</span> à direita.</div>
-<div class="subhead">Por categoria (carroceria)</div>
-<div class="grid2">
-<div class="card l"><h3>Localiza</h3><div class="h">% de veículos por carroceria</div><div class="chartbox" style="height:260px"><canvas id="cCatLoc"></canvas></div></div>
-<div class="card m"><h3>Movida</h3><div class="h">% de veículos por carroceria</div><div class="chartbox" style="height:260px"><canvas id="cCatMov"></canvas></div></div>
-</div>
+<div class="sub">Quem são esses veículos — por <b>marca</b>, <b>modelo</b>, <b>quilometragem</b> e <b>ano-modelo</b>. <span class="pill l">Localiza</span> à esquerda, <span class="pill m">Movida</span> à direita.</div>
 <div class="subhead">Por marca</div>
 <div class="grid2">
 <div class="card l"><h3>Localiza</h3><div class="h">nº de veículos por marca (top 10)</div><div class="chartbox"><canvas id="cMarcaLoc"></canvas></div></div>
@@ -202,10 +197,6 @@ co('coPulso','<b>Prêmio modesto e consistente:</b> a Localiza fica <b>um pouco 
 
 // ===== Mix da frota =====
 const barMarca=(cv,arr,cor)=>new Chart(cv,{type:'bar',data:{labels:arr.map(m=>m[0]),datasets:[{data:arr.map(m=>m[1]),backgroundColor:cor}]},options:opt({indexAxis:'y'})});
-// por categoria (donut)
-const catPal={'Hatch':'#1f77b4','SUV':'#FF6200','Sedan':'#2ca02c','Pick-up':'#9467bd','Outros':'#c8c8c8'};
-const catDonut=(cv,arr)=>{const tot=arr.reduce((s,x)=>s+x[1],0);new Chart(cv,{type:'doughnut',data:{labels:arr.map(x=>x[0]),datasets:[{data:arr.map(x=>x[1]),backgroundColor:arr.map(x=>catPal[x[0]]||'#999'),borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{font:{size:11},usePointStyle:true,padding:10}},tooltip:{callbacks:{label:c=>c.label+' '+c.raw.toLocaleString('pt-BR')+' ('+(100*c.raw/tot).toFixed(0)+'%)'}}}}});};
-catDonut(cCatLoc,D.categoria.localiza);catDonut(cCatMov,D.categoria.movida);
 barMarca(cMarcaLoc,D.localiza.marcas,AZ);barMarca(cMarcaMov,D.movida.marcas,OR);
 barMarca(cModeloLoc,D.localiza.modelos.slice(0,10),AZ);barMarca(cModeloMov,D.movida.modelos.slice(0,10),OR);
 const barHist=(cv,data,labels,cor)=>new Chart(cv,{type:'bar',data:{labels,datasets:[{data,backgroundColor:cor}]},options:opt()});
