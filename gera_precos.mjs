@@ -57,4 +57,5 @@ for (const e of ACOES.empresas) {
 }
 const out = { meta: { atualizado_em: new Date().toISOString(), fonte: "Yahoo Finance (delay ~15min)" }, ibov, precos: PRECOS };
 fs.writeFileSync(path.join(__dirname, "precos.js"), "window.PRECOS = " + JSON.stringify(out) + ";\n");
-console.log(`\nOK: ${ok} cotacoes, ${fail} fallback, IBOV ${ibov.length} pts -> precos.js`);
+fs.writeFileSync(path.join(__dirname, "precos.json"), JSON.stringify(out));
+console.log(`\nOK: ${ok} cotacoes, ${fail} fallback, IBOV ${ibov.length} pts -> precos.js & precos.json`);

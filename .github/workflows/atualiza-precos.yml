@@ -33,5 +33,4 @@ jobs:
         with:
           project-id: ${{ vars.DASHBOARD_FEEDER_PROJECT_ID }}
           api-key: ${{ secrets.DASHBOARD_FEEDER_API_KEY }}
-          path: precos.js
-          name: precos.js
+          path: precos.json
