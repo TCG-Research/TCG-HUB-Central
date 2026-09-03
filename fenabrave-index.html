@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fenabrave — Dashboard de Emplacamentos</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #f0f2f5;
+    --card: #ffffff;
+    --navy: #1a1a1a;
+    --blue: #FF5300;
+    --blue-light: #FFE8DC;
+    --red: #c0392b;
+    --red-light: #fdecea;
+    --green: #27ae60;
+    --green-light: #e8f8f0;
+    --orange: #FF5300;
+    --gray: #6b7280;
+    --border: #e5e7eb;
+    --text: #1f2937;
+    --text2: #6b7280;
+    --radius: 12px;
+    --shadow: 0 2px 8px rgba(0,0,0,.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); }
+
+  /* HEADER */
+  header {
+    background: var(--navy);
+    padding: 18px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  header h1 { color: #fff; font-size: 1.25rem; font-weight: 700; letter-spacing: .3px; }
+  header .sub { color: rgba(255,255,255,.55); font-size: .8rem; margin-top: 2px; }
+  header .badge {
+    background: rgba(255,255,255,.12); color: #fff; font-size: .75rem;
+    padding: 4px 12px; border-radius: 20px;
+  }
+
+  /* TABS */
+  nav {
+    background: var(--navy);
+    display: flex; gap: 4px; padding: 0 32px;
+    border-top: 1px solid rgba(255,255,255,.1);
+  }
+  nav button {
+    background: none; border: none; color: rgba(255,255,255,.55);
+    padding: 10px 18px; font-size: .85rem; cursor: pointer;
+    border-bottom: 3px solid transparent; transition: all .2s;
+  }
+  nav button:hover { color: #fff; }
+  nav button.active { color: #fff; border-bottom-color: #FF5300; font-weight: 600; }
+
+  /* MAIN */
+  main { max-width: 1280px; margin: 0 auto; padding: 28px 24px; }
+
+  /* SECTION */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* KPI CARDS */
+  .kpi-row { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .kpi {
+    flex: 1; min-width: 160px; background: var(--card);
+    border-radius: var(--radius); padding: 18px 20px;
+    box-shadow: var(--shadow); border-left: 4px solid var(--blue);
+  }
+  .kpi.red { border-left-color: var(--red); }
+  .kpi.green { border-left-color: var(--green); }
+  .kpi.orange { border-left-color: var(--orange); }
+  .kpi-label { font-size: .72rem; color: var(--text2); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+  .kpi-value { font-size: 1.6rem; font-weight: 700; color: var(--text); }
+  .kpi-sub { font-size: .75rem; color: var(--text2); margin-top: 3px; }
+  .kpi-delta { font-size: .78rem; font-weight: 600; margin-top: 4px; }
+  .kpi-delta.up { color: var(--green); }
+  .kpi-delta.down { color: var(--red); }
+
+  /* CHART CARDS */
+  .grid { display: grid; gap: 20px; }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  @media(max-width:900px) { .grid-2,.grid-3 { grid-template-columns: 1fr; } }
+
+  .chart-card {
+    background: var(--card); border-radius: var(--radius);
+    padding: 20px 22px; box-shadow: var(--shadow);
+  }
+  .chart-card.full { grid-column: 1 / -1; }
+  .chart-title { font-size: .88rem; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .chart-sub { font-size: .73rem; color: var(--text2); margin-bottom: 16px; }
+  .chart-wrap { position: relative; height: 280px; }
+  .chart-wrap.tall { height: 340px; }
+  .chart-wrap.short { height: 220px; }
+
+  /* VAREJO CONTROLS */
+  .controls { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .controls label { font-size: .82rem; color: var(--text2); }
+  .controls select {
+    padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border);
+    font-size: .85rem; color: var(--text); background: var(--card); cursor: pointer;
+  }
+  .controls select:focus { outline: 2px solid var(--blue); }
+
+  /* INSIGHT BOXES */
+  .insight {
+    background: var(--blue-light); border-left: 4px solid var(--blue);
+    border-radius: 8px; padding: 12px 16px; font-size: .8rem;
+    color: var(--navy); margin-bottom: 20px; line-height: 1.5;
+  }
+  .insight.red-box { background: var(--red-light); border-left-color: var(--red); color: #7f1d1d; }
+  .insight.green-box { background: var(--green-light); border-left-color: var(--green); color: #14532d; }
+  .insight strong { font-weight: 700; }
+
+  /* SECTION TITLE */
+  .sec-title { font-size: 1.05rem; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+  .sec-sub { font-size: .8rem; color: var(--text2); margin-bottom: 20px; }
+
+  /* DOWNLOAD BUTTON */
+  .dl-btn {
+    display: flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 6px; border: 1.5px solid var(--border);
+    background: var(--card); color: var(--text2); font-size: .72rem; font-weight: 600;
+    cursor: pointer; white-space: nowrap; transition: all .15s; flex-shrink: 0;
+  }
+  .dl-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+  .dl-btn svg { width: 12px; height: 12px; }
+  .chart-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 8px; margin-bottom: 4px;
+  }
+  .chart-header-left { flex: 1; min-width: 0; }
+
+  /* BRAND TOGGLE BUTTONS */
+  .brand-toggles { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .brand-btn {
+    padding: 5px 12px; border-radius: 20px; border: 2px solid;
+    font-size: .75rem; font-weight: 600; cursor: pointer;
+    transition: all .15s; opacity: .35;
+  }
+  .brand-btn.on { opacity: 1; color: #fff !important; }
+  .share-note {
+    font-size: .72rem; color: var(--text2); margin-bottom: 10px; font-style: italic;
+  }
+
+  /* SEGMENTED TOGGLE */
+  .seg { display: flex; gap: 6px; margin: 2px 0 12px; }
+  .seg-btn {
+    padding: 5px 14px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--card); color: var(--text2); font-size: .8rem; font-weight: 600;
+    cursor: pointer; transition: all .15s;
+  }
+  .seg-btn:hover { border-color: var(--blue); color: var(--blue); }
+  .seg-btn.on { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+  /* LANGUAGE TOGGLE (header) */
+  .lang-btn {
+    padding: 4px 11px; border-radius: 6px; border: 1px solid rgba(255,255,255,.25);
+    background: transparent; color: rgba(255,255,255,.7); font-size: .75rem; font-weight: 700; cursor: pointer;
+  }
+  .lang-btn:hover { color: #fff; border-color: rgba(255,255,255,.5); }
+  .lang-btn.on { background: #FF5300; border-color: #FF5300; color: #fff; }
+
+  /* TAG / CHIP */
+  .chip {
+    display: inline-block; font-size: .7rem; font-weight: 700;
+    padding: 2px 8px; border-radius: 20px; margin-right: 4px;
+  }
+  .chip.chinese { background: #fee2e2; color: #991b1b; }
+  .chip.ev { background: #d1fae5; color: #065f46; }
+
+  footer {
+    text-align: center; padding: 20px; font-size: .72rem;
+    color: var(--text2); border-top: 1px solid var(--border); margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+<header>
+  <div>
+    <h1 data-en="📊 Fenabrave — Vehicle Registrations Dashboard">📊 Fenabrave — Dashboard de Emplacamentos</h1>
+    <div class="sub" data-en="Passenger cars · Apr/2025 – Ago/2026 &nbsp;|&nbsp; Updated August 2026">Automóveis · Abr/2025 – Ago/2026 &nbsp;|&nbsp; Atualizado em agosto de 2026</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:14px">
+    <div style="display:flex;gap:5px">
+      <button id="langPt" class="lang-btn on" onclick="setLang('pt')">PT</button>
+      <button id="langEn" class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+    <div class="badge" data-en="14 months of data">14 meses de dados</div>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('geral')" data-en="Overview">Visão Geral</button>
+  <button onclick="showTab('marcas')" data-en="Brands">Marcas</button>
+  <button onclick="showTab('chineses')" data-en="🇨🇳 Chinese Cars">🇨🇳 Carros Chineses</button>
+  <button onclick="showTab('eletri')" data-en="⚡ Electrified">⚡ Eletrificados</button>
+  <button onclick="showTab('varejo')" data-en="🛒 Retail">🛒 Varejo</button>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════════════ GERAL -->
+<div class="section active" id="sec-geral">
+  <div class="kpi-row" id="kpi-geral"></div>
+  <div class="grid">
+    <div class="chart-card full">
+      <div class="chart-title" data-en="Total Registrations — Passenger Cars">Volume Total de Emplacamentos — Automóveis</div>
+      <div class="chart-sub" data-en="Units registered per month">Unidades emplacadas por mês</div>
+      <div class="chart-wrap tall"><canvas id="chartAutos"></canvas></div>
+    </div>
+  </div>
+  <div style="height:20px"></div>
+  <div class="grid grid-2">
+    <div class="chart-card">
+      <div class="chart-title" data-en="Chinese Brands Growth">Crescimento das Marcas Chinesas</div>
+      <div class="chart-sub" data-en="Select brands — the market-share line updates automatically">Selecione as marcas — a linha de market share atualiza automaticamente</div>
+      <div class="brand-toggles" id="chBrandToggles"></div>
+      <div class="share-note" id="shareNote"></div>
+      <div class="chart-wrap"><canvas id="chartStack"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title" data-en="YoY Growth — Total Market">Crescimento YoY — Mercado Total</div>
+      <div class="chart-sub" data-en="% change vs. same month last year">Variação % vs mesmo mês do ano anterior</div>
+      <div class="chart-wrap"><canvas id="chartEletriGeral"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ MARCAS -->
+<div class="section" id="sec-marcas">
+  <div class="sec-title" data-en="Evolution by Manufacturer — Passenger Cars">Evolução por Fabricante — Automóveis</div>
+  <div class="sec-sub" data-en="Top 8 brands by cumulative volume in the period">Top 8 marcas por volume acumulado no período</div>
+  <div class="chart-card" style="margin-bottom:20px">
+    <div class="chart-title" data-en="Monthly Registrations by Manufacturer">Emplacamentos Mensais por Fabricante</div>
+    <div class="seg">
+      <button id="marcasModoEmpl" class="seg-btn on" onclick="setMarcasModo('empl')" data-en="Registrations">Emplacamentos</button>
+      <button id="marcasModoShare" class="seg-btn" onclick="setMarcasModo('share')" data-en="Share (%)">Share (%)</button>
+    </div>
+    <div class="chart-wrap tall"><canvas id="chartMarcas"></canvas></div>
+  </div>
+  <div class="grid grid-2">
+    <div class="chart-card">
+      <div class="chart-title" data-en="Latest Month Ranking (Ago/2026)">Ranking do Último Mês (Ago/2026)</div>
+      <div class="chart-sub" data-en="Registration volume">Volume de emplacamentos</div>
+      <div class="chart-wrap"><canvas id="chartMarcasBar"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title" data-en="Market Share — Latest Month">Market Share — Último Mês</div>
+      <div class="chart-sub" data-en="% share by manufacturer (top 8)">Participação % por fabricante (top 8)</div>
+      <div class="chart-wrap"><canvas id="chartMarcasPie"></canvas></div>
+    </div>
+  </div>
+  <div style="height:20px"></div>
+  <div class="chart-card full">
+    <div class="chart-title" data-en="Models with Highest YoY Growth — Retail">Modelos com Maior Crescimento YoY — Varejo</div>
+    <div class="chart-sub" data-en="Ago/2026 vs. Ago/2025 · only models present in both periods · sorted by growth">Comparação Agosto/2026 vs Agosto/2025 · apenas modelos presentes nos dois períodos · ordenados por crescimento</div>
+    <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+      <label style="font-size:.8rem;color:var(--text2)" data-en="Show:">Mostrar:</label>
+      <select id="yoyModelFilter" onchange="updateYoyChart()" style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);font-size:.82rem;background:var(--card);cursor:pointer">
+        <option value="all" data-en="All (growth and decline)">Todos (crescimento e queda)</option>
+        <option value="pos" data-en="Growth only">Só crescimento</option>
+        <option value="neg" data-en="Decline only">Só queda</option>
+      </select>
+      <label style="font-size:.8rem;color:var(--text2);margin-left:8px" data-en="Top:">Top:</label>
+      <select id="yoyModelTop" onchange="updateYoyChart()" style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);font-size:.82rem;background:var(--card);cursor:pointer">
+        <option value="10" data-en="10 models">10 modelos</option>
+        <option value="15" selected data-en="15 models">15 modelos</option>
+        <option value="20" data-en="20 models">20 modelos</option>
+      </select>
+    </div>
+    <div class="chart-wrap" style="height:420px"><canvas id="chartYoyModelos"></canvas></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ CHINESES -->
+<div class="section" id="sec-chineses">
+  <div class="sec-title" data-en="The Rise of Chinese Cars in Brazil">Avanço dos Carros Chineses no Brasil</div>
+  <div class="sec-sub" data-en='Brands included: <span class="chip chinese">BYD</span><span class="chip chinese">GWM</span><span class="chip chinese">CAOA CHERY</span><span class="chip chinese">JAC</span><span class="chip chinese">JAECOO</span>'>
+    Marcas consideradas: <span class="chip chinese">BYD</span><span class="chip chinese">GWM</span><span class="chip chinese">CAOA CHERY</span><span class="chip chinese">JAC</span><span class="chip chinese">JAECOO</span>
+  </div>
+  <div id="kpi-chineses" class="kpi-row"></div>
+  <div class="insight red-box" id="insight-ch"></div>
+  <div class="grid grid-2" style="margin-bottom:20px">
+    <div class="chart-card">
+      <div class="chart-title" data-en="Chinese Brands Market Share (%)">Market Share dos Chineses (%)</div>
+      <div class="chart-sub" data-en="Share of total passenger cars">Participação sobre o total de Automóveis</div>
+      <div class="chart-wrap"><canvas id="chartChShare"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title" data-en="Volume — Chinese vs. non-Chinese">Volume — Chineses vs. ex-Chineses</div>
+      <div class="chart-sub" data-en="Monthly registrations, stacked">Emplacamentos mensais empilhados</div>
+      <div class="chart-wrap"><canvas id="chartChStack"></canvas></div>
+    </div>
+  </div>
+  <div class="chart-card" style="margin-bottom:20px">
+    <div class="chart-title" data-en="Evolution by Chinese Brand">Evolução por Marca Chinesa</div>
+    <div class="chart-sub" data-en="Monthly volume by manufacturer">Volume mensal por fabricante</div>
+    <div class="chart-wrap tall"><canvas id="chartChMarcas"></canvas></div>
+  </div>
+  <div class="grid grid-2">
+    <div class="chart-card">
+      <div class="chart-title" data-en="Growth: Chinese vs. non-Chinese">Crescimento: Chineses vs. ex-Chineses</div>
+      <div class="chart-sub" data-en="% change month over month">Variação % mês a mês</div>
+      <div class="chart-wrap"><canvas id="chartChGrowth"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title" data-en="Share by Chinese Brand — Latest Month">Share por Marca Chinesa — Último Mês</div>
+      <div class="chart-sub" data-en="Internal split among Chinese brands">Distribuição interna entre as marcas chinesas</div>
+      <div class="chart-wrap"><canvas id="chartChPie"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ ELETRIFICADOS -->
+<div class="section" id="sec-eletri">
+  <div class="sec-title" data-en="Electrified Market — Passenger Cars">Mercado de Eletrificados — Automóveis</div>
+  <div class="sec-sub" data-en="Hybrids and pure EVs, monthly data (non-cumulative)">Híbridos e elétricos puros, dados mensais (sem acumulado)</div>
+  <div id="kpi-eletri" class="kpi-row"></div>
+  <div class="insight green-box" id="insight-ele"></div>
+  <div class="chart-card" style="margin-bottom:20px">
+    <div class="chart-title" data-en="Hybrids and EVs — Monthly Evolution">Híbridos e Elétricos — Evolução Mensal</div>
+    <div class="chart-wrap tall"><canvas id="chartEletri"></canvas></div>
+  </div>
+  <div class="grid grid-2">
+    <div class="chart-card">
+      <div class="chart-title" data-en="Top Brands — Hybrids (monthly)">Top Marcas — Híbridos (mensais)</div>
+      <div class="chart-sub" data-en="Volume by manufacturer">Volume por fabricante</div>
+      <div class="chart-wrap tall"><canvas id="chartHib"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title" data-en="Top Brands — EVs (monthly)">Top Marcas — Elétricos (mensais)</div>
+      <div class="chart-sub" data-en="Volume by manufacturer">Volume por fabricante</div>
+      <div class="chart-wrap tall"><canvas id="chartEle"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ VAREJO -->
+<div class="section" id="sec-varejo">
+  <div class="sec-title" data-en="Most Registered Models — Retail Sales">Modelos Mais Emplacados — Venda ao Varejo</div>
+  <div class="sec-sub" data-en="Top 15 passenger cars in the retail channel by month">Top 15 automóveis no canal varejo por mês</div>
+  <div class="controls">
+    <label data-en="Select month:">Selecionar mês:</label>
+    <select id="varejoSelect" onchange="updateVarejo()"></select>
+    <label style="margin-left:16px" data-en="Compare with:">Comparar com:</label>
+    <select id="varejoSelect2" onchange="updateVarejo()">
+      <option value="" data-en="— none —">— nenhum —</option>
+    </select>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title" id="varejoTitle">Top 15 Modelos</div>
+    <div class="chart-sub" id="varejoSub" data-en="Retail sales — passenger cars">Venda varejo — automóveis</div>
+    <div class="chart-wrap" style="height:400px"><canvas id="chartVarejo"></canvas></div>
+  </div>
+  <div style="height:20px"></div>
+  <div class="chart-card">
+    <div class="chart-title" data-en="Top 6 Models Evolution Over Time">Evolução dos Top 6 Modelos ao Longo do Tempo</div>
+    <div class="chart-sub" data-en="Select the models of interest below">Selecione os modelos de interesse abaixo</div>
+    <div id="modelSelector" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px"></div>
+    <div class="chart-wrap tall"><canvas id="chartModelEvol"></canvas></div>
+  </div>
+</div>
+
+</main>
+<footer data-en="Source: Fenabrave — Vehicle Registration Report &nbsp;|&nbsp; Dashboard generated automatically from the monthly PDFs">Fonte: Fenabrave — Informativo de Emplacamentos &nbsp;|&nbsp; Dashboard gerado automaticamente a partir dos PDFs mensais</footer>
+
+<script>
+// ══════════════════════════════════════════════
+//  i18n (PT / EN) — idioma salvo no navegador; o toggle recarrega a página
+// ══════════════════════════════════════════════
+let LANG = (localStorage.getItem('fnbLang') === 'en') ? 'en' : 'pt';
+const t = (pt, en) => LANG === 'en' ? en : pt;
+const LOC = () => LANG === 'en' ? 'en-US' : 'pt-BR';
+const _MES = { jan:'Jan', fev:'Feb', mar:'Mar', abr:'Apr', mai:'May', jun:'Jun', jul:'Jul', ago:'Aug', set:'Sep', out:'Oct', nov:'Nov', dez:'Dec' };
+const _MESL = { janeiro:'January', fevereiro:'February', 'março':'March', marco:'March', abril:'April', maio:'May', junho:'June', julho:'July', agosto:'August', setembro:'September', outubro:'October', novembro:'November', dezembro:'December' };
+const mesShort = s => LANG !== 'en' ? s : String(s).replace(/[A-Za-zçÇ]+/, m => _MES[m.toLowerCase()] || m);
+const mesLong  = s => LANG !== 'en' ? s : String(s).replace(/[A-Za-zçÇ]+/, m => _MESL[m.toLowerCase()] || m);
+function setLang(l){ localStorage.setItem('fnbLang', l); location.reload(); }
+function applyStaticI18n(){
+  document.documentElement.lang = LANG;
+  if (LANG === 'en') document.querySelectorAll('[data-en]').forEach(e => { e.innerHTML = e.getAttribute('data-en'); });
+  const bp = document.getElementById('langPt'), be = document.getElementById('langEn');
+  if (bp) bp.classList.toggle('on', LANG === 'pt');
+  if (be) be.classList.toggle('on', LANG === 'en');
+}
+applyStaticI18n();
+
+// ══════════════════════════════════════════════
+//  DADOS
+// ══════════════════════════════════════════════
+const D = {
+  labels: ["Abr/25","Mai/25","Jun/25","Jul/25","Ago/25","Set/25","Out/25","Nov/25","Dez/25","Jan/26","Fev/26","Mar/26","Abr/26","Mai/26","Jun/26","Jul/26","Ago/26"],
+  labelsLong: ["Abril/2025","Maio/2025","Junho/2025","Julho/2025","Agosto/2025","Setembro/2025","Outubro/2025","Novembro/2025","Dezembro/2025","Janeiro/2026","Fevereiro/2026","Março/2026","Abril/2026","Maio/2026","Junho/2026","Julho/2026","Agosto/2026"],
+  autos: [152267,167540,159128,181787,172280,178548,192752,182044,210732,125136,140548,206375,187313,214300,212902,212691,212876],
+  ch:    [15315,18936,16221,21629,21583,22671,24467,23569,31556,21209,22143,34797,38206,47480,49628,58287,58968],
+  excl:  [136952,148604,142907,160158,150697,155877,168285,158475,179176,103927,118405,171578,149107,166820,163274,154404,153908],
+  chShare:[10.06,11.30,10.19,11.90,12.53,12.70,12.69,12.95,14.97,16.95,15.75,16.86,20.40,22.16,23.31,27.4,27.7],
+  yoyAnt:[164304,143991,163786,178022,170950,171640,195170,193683,189822,123344,134769,141532,152257,167540,159128,181787,172280],
+  yoyPct:[-7.3,16.4,-2.8,2.1,0.8,4.0,-1.2,-6.0,11.0,1.5,4.3,45.8,23.0,27.9,33.8,17,23.6],
+  momPct:[null,10.0,-5.0,14.2,-5.2,3.6,8.0,-5.6,15.8,-40.6,12.3,46.8,-9.2,14.4,-0.7,-0.1,0.1],
+  hib:   [14925,15155,15267,18015,17533,18955,19702,18609,27823,18995,19250,25630,25767,30335,32563,34961,35304],
+  ele:   [4678,6936,5873,6953,7594,8023,7826,7202,11456,8198,8654,13991,17468,20878,21018,25698,27061],
+  top8:  ["VW","FIAT","GM","HYUNDAI","BYD","JEEP","TOYOTA","HONDA"],
+  marcas: {
+    VW:      [26687,31630,32192,35927,33869,31530,35303,35740,39245,22656,26046,37216,31989,39505,42425,36183,35617],
+    FIAT:    [24548,26363,24258,31011,27862,24932,27739,25550,29195,17191,21789,27264,23638,25625,27234,25136,26375],
+    GM:      [16016,16889,17554,20094,17933,20669,21630,23023,24252,13229,14144,23857,20677,23172,22027,24626,23120],
+    HYUNDAI: [16252,18649,15851,16234,16682,18803,24029,19890,20585,10176,12116,19147,18557,20234,16425,13263,17013],
+    BYD:     [8341,9293,8077,9616,9749,9934,10127,9726,15530,9755,11379,16277,18398,21674,21219,23423,24427],
+    JEEP:    [9288,10530,9156,9960,9043,11540,12700,11964,13358,8893,8235,10117,8529,10395,10255,9123,9026],
+    TOYOTA:  [12390,11189,10331,11921,12053,11907,7452,3980,7374,5310,6976,11736,10364,10654,10456,11767,9956],
+    HONDA:   [8297,9260,9186,7433,7473,7982,10067,8975,10832,6722,7574,9910,9016,10288,10033,9811,9677],
+  },
+  chMarcas: {
+    BYD:           [8341,9293,8077,9616,9749,9934,10127,9726,15530,9755,11379,16277,18398,21674,21219,23423,24427],
+    "CAOA CHERY":  [4643,6152,4742,6722,6750,7366,8083,7052,7208,3548,3401,8771,7482,6660,7152,7354,6014],
+    GWM:           [2331,3216,3021,3932,3825,3965,4796,4593,5144,4171,4640,5923,4579,6685,6106,8498,9204],
+    "OMODA JAECOO":[0,275,381,721,720,838,862,1213,1943,1689,1834,2451,2826,3176,4832,5759,5902],
+    GEELY:         [0,0,0,0,0,0,0,985,1731,1337,422,1375,4003,5173,5835,7458,7524],
+    GAC:           [0,0,0,638,539,568,599,0,0,709,467,0,918,1364,1490,1947,1851],
+    "CAOA CHANGAN":[0,0,0,0,0,0,0,0,0,0,0,0,0,1164,1054,1745,1576],
+    LEAPMOTOR:     [0,0,0,0,0,0,0,0,0,0,0,0,0,893,989,1106,1017],
+    JETOUR:        [0,0,0,0,0,0,0,0,0,0,0,0,0,691,951,997,1453],
+  },
+  hibMarcas: {
+    BYD:     [4738,3700,3602,4128,4097,4243,4735,5240,8429,4642,4620,6376,7973,8430,8519,8664,8350],
+    GWM:     [2140,3035,2838,3741,3405,3232,3995,3809,3998,3096,3742,4440,3292,4975,4647,6280,6944],
+    FIAT:    [3932,4298,4348,4690,3576,4011,3938,2986,3428,2206,1798,2540,2276,2401,1747,1714,2167],
+    TOYOTA:  [1526,1273,1254,1352,2470,3036,1884,1953,5189,3944,4261,5028,4138,3951,3648,3586,2831],
+    "OMODA JAECOO":[0,0,0,620,635,740,778,1146,1875,1648,1772,2382,2710,3095,4794,5741,5787],
+    "M.BENZ":[717,807,788,725,708,833,962,700,740,0,513,709,0,581,627,624,442],
+  },
+  eleMarcas: {
+    BYD:    [3602,5591,4475,5486,5649,5687,5391,4485,7099,5113,6759,9901,10425,13244,12699,14759,16077],
+    GEELY:  [0,0,0,0,0,196,265,985,1731,1337,422,1375,3761,4567,4663,6222,6178],
+    VOLVO:  [424,514,464,329,375,430,505,350,575,390,183,441,419,347,339,300,178],
+    GM:     [0,0,0,0,317,421,492,296,613,396,443,982,1247,1122,871,592,571],
+    GWM:    [191,181,183,191,320,429,343,214,372,193,226,313,365,490,383,1035,1286],
+  },
+  varejo: {"Abril/2025":[{"posicao":1,"modelo":"HONDA/HR-V","quantidade":4339},{"posicao":2,"modelo":"HYUNDAI/CRETA","quantidade":4081},{"posicao":3,"modelo":"VW/T CROSS","quantidade":3907},{"posicao":4,"modelo":"TOYOTA/COROLLA CROSS","quantidade":3648},{"posicao":5,"modelo":"VW/POLO","quantidade":3555},{"posicao":6,"modelo":"GM/ONIX","quantidade":3132},{"posicao":7,"modelo":"FIAT/FASTBACK","quantidade":2999},{"posicao":8,"modelo":"BYD/SONG","quantidade":2979},{"posicao":9,"modelo":"VW/NIVUS","quantidade":2820},{"posicao":10,"modelo":"GM/TRACKER","quantidade":2567},{"posicao":11,"modelo":"HYUNDAI/HB20","quantidade":2494},{"posicao":12,"modelo":"FIAT/PULSE","quantidade":2121},{"posicao":13,"modelo":"BYD/DOLPHIN MINI","quantidade":2101},{"posicao":14,"modelo":"FIAT/ARGO","quantidade":2058},{"posicao":15,"modelo":"JEEP/RENEGADE","quantidade":1983}],"Maio/2025":[{"posicao":1,"modelo":"HONDA/HR-V","quantidade":4657},{"posicao":2,"modelo":"HYUNDAI/CRETA","quantidade":4021},{"posicao":3,"modelo":"VW/T CROSS","quantidade":3997},{"posicao":4,"modelo":"VW/POLO","quantidade":3541},{"posicao":5,"modelo":"FIAT/FASTBACK","quantidade":3377},{"posicao":6,"modelo":"VW/NIVUS","quantidade":3222},{"posicao":7,"modelo":"CAOA CHERY/TIGGO 7","quantidade":3047},{"posicao":8,"modelo":"GM/ONIX","quantidade":3004},{"posicao":9,"modelo":"GM/TRACKER","quantidade":2996},{"posicao":10,"modelo":"BYD/SONG","quantidade":2807},{"posicao":11,"modelo":"TOYOTA/COROLLA CROSS","quantidade":2651},{"posicao":12,"modelo":"HYUNDAI/HB20","quantidade":2495},{"posicao":13,"modelo":"BYD/DOLPHIN MINI","quantidade":2442},{"posicao":14,"modelo":"FIAT/ARGO","quantidade":2204},{"posicao":15,"modelo":"NISSAN/KICKS","quantidade":2051}],"Junho/2025":[{"posicao":1,"modelo":"HYUNDAI/CRETA","quantidade":5427},{"posicao":2,"modelo":"HONDA/HR-V","quantidade":4140},{"posicao":3,"modelo":"VW/T CROSS","quantidade":3603},{"posicao":4,"modelo":"VW/NIVUS","quantidade":3504},{"posicao":5,"modelo":"FIAT/FASTBACK","quantidade":3282},{"posicao":6,"modelo":"GM/ONIX","quantidade":3236},{"posicao":7,"modelo":"VW/POLO","quantidade":3123},{"posicao":8,"modelo":"GM/TRACKER","quantidade":2931},{"posicao":9,"modelo":"BYD/SONG","quantidade":2689},{"posicao":10,"modelo":"TOYOTA/COROLLA CROSS","quantidade":2682},{"posicao":11,"modelo":"CAOA CHERY/TIGGO 7","quantidade":2480},{"posicao":12,"modelo":"HYUNDAI/HB20","quantidade":2273},{"posicao":13,"modelo":"FIAT/PULSE","quantidade":2115},{"posicao":14,"modelo":"GWM/HAVAL H6","quantidade":1921},{"posicao":15,"modelo":"FIAT/ARGO","quantidade":1821}],"Julho/2025":[{"posicao":1,"modelo":"HYUNDAI/CRETA","quantidade":6359},{"posicao":2,"modelo":"GM/TRACKER","quantidade":4928},{"posicao":3,"modelo":"VW/POLO","quantidade":4894},{"posicao":4,"modelo":"VW/NIVUS","quantidade":4726},{"posicao":5,"modelo":"FIAT/FASTBACK","quantidade":4185},{"posicao":6,"modelo":"GM/ONIX","quantidade":4141},{"posicao":7,"modelo":"VW/T CROSS","quantidade":3986},{"posicao":8,"modelo":"TOYOTA/COROLLA CROSS","quantidade":3553},{"posicao":9,"modelo":"CAOA CHERY/TIGGO 7","quantidade":3544},{"posicao":10,"modelo":"HONDA/HR-V","quantidade":3367},{"posicao":11,"modelo":"HYUNDAI/HB20","quantidade":3349},{"posicao":12,"modelo":"FIAT/PULSE","quantidade":3119},{"posicao":13,"modelo":"NISSAN/KICKS","quantidade":3091},{"posicao":14,"modelo":"VW/TERA","quantidade":2983},{"posicao":15,"modelo":"BYD/SONG","quantidade":2934}],"Agosto/2025":[{"posicao":1,"modelo":"HYUNDAI/CRETA","quantidade":5215},{"posicao":2,"modelo":"VW/POLO","quantidade":5214},{"posicao":3,"modelo":"TOYOTA/COROLLA CROSS","quantidade":4388},{"posicao":4,"modelo":"VW/NIVUS","quantidade":3902},{"posicao":5,"modelo":"FIAT/FASTBACK","quantidade":3852},{"posicao":6,"modelo":"HONDA/HR-V","quantidade":3605},{"posicao":7,"modelo":"HYUNDAI/HB20","quantidade":3438},{"posicao":8,"modelo":"FIAT/ARGO","quantidade":3389},{"posicao":9,"modelo":"GM/TRACKER","quantidade":3331},{"posicao":10,"modelo":"CAOA CHERY/TIGGO 7","quantidade":3192},{"posicao":11,"modelo":"VW/TERA","quantidade":3166},{"posicao":12,"modelo":"BYD/DOLPHIN MINI","quantidade":3036},{"posicao":13,"modelo":"GM/ONIX","quantidade":2900},{"posicao":14,"modelo":"FIAT/PULSE","quantidade":2891},{"posicao":15,"modelo":"VW/T CROSS","quantidade":2881}],"Setembro/2025":[{"posicao":1,"modelo":"HYUNDAI/CRETA","quantidade":4976},{"posicao":2,"modelo":"VW/POLO","quantidade":4542},{"posicao":3,"modelo":"TOYOTA/COROLLA CROSS","quantidade":4122},{"posicao":4,"modelo":"GM/ONIX","quantidade":4026},{"posicao":5,"modelo":"VW/TERA","quantidade":3916},{"posicao":6,"modelo":"FIAT/FASTBACK","quantidade":3792},{"posicao":7,"modelo":"GM/TRACKER","quantidade":3763},{"posicao":8,"modelo":"HONDA/HR-V","quantidade":3569},{"posicao":9,"modelo":"CAOA CHERY/TIGGO 7","quantidade":3506},{"posicao":10,"modelo":"VW/NIVUS","quantidade":3492},{"posicao":11,"modelo":"FIAT/ARGO","quantidade":3484},{"posicao":12,"modelo":"HYUNDAI/HB20","quantidade":3328},{"posicao":13,"modelo":"BYD/DOLPHIN MINI","quantidade":3067},{"posicao":14,"modelo":"NISSAN/KICKS","quantidade":2945},{"posicao":15,"modelo":"BYD/SONG","quantidade":2727}],"Outubro/2025":[{"posicao":1,"modelo":"HYUNDAI/CRETA","quantidade":5480},{"posicao":2,"modelo":"VW/TERA","quantidade":5395},{"posicao":3,"modelo":"HONDA/HR-V","quantidade":4870},{"posicao":4,"modelo":"GM/ONIX","quantidade":4332},{"posicao":5,"modelo":"CAOA CHERY/TIGGO 7","quantidade":4100},{"posicao":6,"modelo":"GM/TRACKER","quantidade":3855},{"posicao":7,"modelo":"VW/POLO","quantidade":3729},{"posicao":8,"modelo":"HYUNDAI/HB20","quantidade":3631},{"posicao":9,"modelo":"FIAT/FASTBACK","quantidade":3594},{"posicao":10,"modelo":"VW/NIVUS","quantidade":3433},{"posicao":11,"modelo":"FIAT/ARGO","quantidade":3418},{"posicao":12,"modelo":"NISSAN/KICKS","quantidade":3149},{"posicao":13,"modelo":"BYD/SONG","quantidade":2859},{"posicao":14,"modelo":"GWM/HAVAL H6","quantidade":2597},{"posicao":15,"modelo":"BYD/DOLPHIN MINI","quantidade":2578}],"Novembro/2025":[{"posicao":1,"modelo":"VW/TERA","quantidade":4599},{"posicao":2,"modelo":"HYUNDAI/CRETA","quantidade":4576},{"posicao":3,"modelo":"CAOA CHERY/TIGGO 7","quantidade":3883},{"posicao":4,"modelo":"GM/ONIX","quantidade":3810},{"posicao":5,"modelo":"HONDA/HR-V","quantidade":3779},{"posicao":6,"modelo":"BYD/SONG","quantidade":3595},{"posicao":7,"modelo":"HYUNDAI/HB20","quantidade":3144},{"posicao":8,"modelo":"GM/TRACKER","quantidade":3131},{"posicao":9,"modelo":"VW/POLO","quantidade":3039},{"posicao":10,"modelo":"FIAT/FASTBACK","quantidade":2921},{"posicao":11,"modelo":"VW/NIVUS","quantidade":2708},{"posicao":12,"modelo":"GWM/HAVAL H6","quantidade":2682},{"posicao":13,"modelo":"NISSAN/KICKS","quantidade":2672},{"posicao":14,"modelo":"BYD/DOLPHIN MINI","quantidade":2653},{"posicao":15,"modelo":"FIAT/ARGO","quantidade":2634}],"Dezembro/2025":[{"posicao":1,"modelo":"BYD/SONG","quantidade":6733},{"posicao":2,"modelo":"VW/TERA","quantidade":6245},{"posicao":3,"modelo":"HYUNDAI/CRETA","quantidade":5309},{"posicao":4,"modelo":"GM/TRACKER","quantidade":5069},{"posicao":5,"modelo":"GM/ONIX","quantidade":4509},{"posicao":6,"modelo":"CAOA CHERY/TIGGO 7","quantidade":4472},{"posicao":7,"modelo":"VW/POLO","quantidade":4053},{"posicao":8,"modelo":"BYD/DOLPHIN MINI","quantidade":3767},{"posicao":9,"modelo":"FIAT/FASTBACK","quantidade":3692},{"posicao":10,"modelo":"HYUNDAI/HB20","quantidade":3670},{"posicao":11,"modelo":"VW/NIVUS","quantidade":3628},{"posicao":12,"modelo":"NISSAN/KICKS","quantidade":3440},{"posicao":13,"modelo":"HONDA/HR-V","quantidade":3325},{"posicao":14,"modelo":"HONDA/WR-V","quantidade":3179},{"posicao":15,"modelo":"VW/T CROSS","quantidade":2933}],"Janeiro/2026":[{"posicao":1,"modelo":"HYUNDAI/CRETA","quantidade":3905},{"posicao":2,"modelo":"GM/TRACKER","quantidade":3685},{"posicao":3,"modelo":"VW/TERA","quantidade":3665},{"posicao":4,"modelo":"BYD/SONG","quantidade":3207},{"posicao":5,"modelo":"HYUNDAI/HB20","quantidade":3122},{"posicao":6,"modelo":"VW/POLO","quantidade":3066},{"posicao":7,"modelo":"FIAT/FASTBACK","quantidade":2890},{"posicao":8,"modelo":"GM/ONIX","quantidade":2844},{"posicao":9,"modelo":"BYD/DOLPHIN MINI","quantidade":2797},{"posicao":10,"modelo":"VW/NIVUS","quantidade":2631},{"posicao":11,"modelo":"VW/T CROSS","quantidade":2578},{"posicao":12,"modelo":"NISSAN/KICKS","quantidade":2378},{"posicao":13,"modelo":"FIAT/PULSE","quantidade":2207},{"posicao":14,"modelo":"FIAT/ARGO","quantidade":2148},{"posicao":15,"modelo":"HONDA/HR-V","quantidade":2092}],"Fevereiro/2026":[{"posicao":1,"modelo":"BYD/DOLPHIN MINI","quantidade":4810},{"posicao":2,"modelo":"VW/TERA","quantidade":3856},{"posicao":3,"modelo":"HYUNDAI/CRETA","quantidade":3597},{"posicao":4,"modelo":"BYD/SONG","quantidade":3167},{"posicao":5,"modelo":"GM/TRACKER","quantidade":3023},{"posicao":6,"modelo":"VW/NIVUS","quantidade":2971},{"posicao":7,"modelo":"VW/POLO","quantidade":2831},{"posicao":8,"modelo":"HONDA/WR-V","quantidade":2617},{"posicao":9,"modelo":"HYUNDAI/HB20","quantidade":2559},{"posicao":10,"modelo":"FIAT/FASTBACK","quantidade":2464},{"posicao":11,"modelo":"GWM/HAVAL H6","quantidade":2399},{"posicao":12,"modelo":"CAOA CHERY/TIGGO 7","quantidade":2172},{"posicao":13,"modelo":"TOYOTA/COROLLA CROSS","quantidade":2111},{"posicao":14,"modelo":"GM/ONIX","quantidade":2080},{"posicao":15,"modelo":"HONDA/HR-V","quantidade":2036}],"Março/2026":[{"posicao":1,"modelo":"BYD/DOLPHIN MINI","quantidade":6077},{"posicao":2,"modelo":"CAOA CHERY/TIGGO 5X","quantidade":5005},{"posicao":3,"modelo":"HYUNDAI/CRETA","quantidade":4803},{"posicao":4,"modelo":"VW/TERA","quantidade":4505},{"posicao":5,"modelo":"VW/NIVUS","quantidade":4225},{"posicao":6,"modelo":"GM/TRACKER","quantidade":3979},{"posicao":7,"modelo":"BYD/SONG","quantidade":3789},{"posicao":8,"modelo":"VW/POLO","quantidade":3646},{"posicao":9,"modelo":"TOYOTA/YARIS CROSS","quantidade":3341},{"posicao":10,"modelo":"GM/ONIX","quantidade":3248},{"posicao":11,"modelo":"HONDA/WR-V","quantidade":2920},{"posicao":12,"modelo":"HYUNDAI/HB20","quantidade":2917},{"posicao":13,"modelo":"GWM/HAVAL H6","quantidade":2913},{"posicao":14,"modelo":"HONDA/HR-V","quantidade":2900},{"posicao":15,"modelo":"VW/T CROSS","quantidade":2831}],"Abril/2026":[{"posicao":1,"modelo":"BYD/DOLPHIN MINI","quantidade":5943},{"posicao":2,"modelo":"HYUNDAI/CRETA","quantidade":4895},{"posicao":3,"modelo":"BYD/SONG","quantidade":4078},{"posicao":4,"modelo":"CAOA CHERY/TIGGO 5X","quantidade":3915},{"posicao":5,"modelo":"VW/NIVUS","quantidade":3857},{"posicao":6,"modelo":"GM/TRACKER","quantidade":3672},{"posicao":7,"modelo":"GEELY/EX2","quantidade":3590},{"posicao":8,"modelo":"VW/TERA","quantidade":3470},{"posicao":9,"modelo":"TOYOTA/YARIS CROSS","quantidade":3431},{"posicao":10,"modelo":"VW/POLO","quantidade":3238},{"posicao":11,"modelo":"HONDA/HR-V","quantidade":3042},{"posicao":12,"modelo":"GM/ONIX","quantidade":2972},{"posicao":13,"modelo":"BYD/DOLPHIN","quantidade":2811},{"posicao":14,"modelo":"FIAT/FASTBACK","quantidade":2755},{"posicao":15,"modelo":"VW/T CROSS","quantidade":2655}],"Maio/2026":[{"posicao":1,"modelo":"BYD/DOLPHIN MINI","quantidade":6478},{"posicao":2,"modelo":"HYUNDAI/CRETA","quantidade":4821},{"posicao":3,"modelo":"GEELY/EX2","quantidade":4250},{"posicao":4,"modelo":"BYD/DOLPHIN","quantidade":4163},{"posicao":5,"modelo":"BYD/SONG","quantidade":4029},{"posicao":6,"modelo":"GM/TRACKER","quantidade":3357},{"posicao":7,"modelo":"TOYOTA/YARIS CROSS","quantidade":3214},{"posicao":8,"modelo":"GWM/HAVAL H6","quantidade":3213},{"posicao":9,"modelo":"VW/NIVUS","quantidade":3177},{"posicao":10,"modelo":"GM/ONIX","quantidade":3121},{"posicao":11,"modelo":"VW/T CROSS","quantidade":3100},{"posicao":12,"modelo":"VW/TERA","quantidade":3060},{"posicao":13,"modelo":"VW/POLO","quantidade":2842},{"posicao":14,"modelo":"HONDA/HR-V","quantidade":2789},{"posicao":15,"modelo":"HYUNDAI/HB20","quantidade":2658}],"Junho/2026":[{"posicao":1,"modelo":"BYD/DOLPHIN MINI","quantidade":5143},{"posicao":2,"modelo":"BYD/DOLPHIN","quantidade":4827},{"posicao":3,"modelo":"GEELY/EX2","quantidade":4363},{"posicao":4,"modelo":"BYD/SONG","quantidade":4146},{"posicao":5,"modelo":"HYUNDAI/CRETA","quantidade":4095},{"posicao":6,"modelo":"CAOA CHERY/TIGGO 5X","quantidade":3823},{"posicao":7,"modelo":"VW/T CROSS","quantidade":3433},{"posicao":8,"modelo":"VW/TERA","quantidade":3409},{"posicao":9,"modelo":"TOYOTA/YARIS CROSS","quantidade":3395},{"posicao":10,"modelo":"VW/NIVUS","quantidade":3381},{"posicao":11,"modelo":"VW/POLO","quantidade":3021},{"posicao":12,"modelo":"GM/TRACKER","quantidade":3008},{"posicao":13,"modelo":"GM/ONIX","quantidade":2994},{"posicao":14,"modelo":"FIAT/FASTBACK","quantidade":2934},{"posicao":15,"modelo":"OMODA JAECOO/JAECOO 7","quantidade":2730}],"Julho/2026":[{"posicao":1,"modelo":"BYD/DOLPHIN","quantidade":5861},{"posicao":2,"modelo":"GEELY/EX2","quantidade":5707},{"posicao":3,"modelo":"BYD/DOLPHIN MINI","quantidade":5537},{"posicao":4,"modelo":"VW/TERA","quantidade":4470},{"posicao":5,"modelo":"HYUNDAI/CRETA","quantidade":4185},{"posicao":6,"modelo":"TOYOTA/YARIS CROSS","quantidade":4096},{"posicao":7,"modelo":"GM/TRACKER","quantidade":4091},{"posicao":8,"modelo":"GWM/HAVAL H6","quantidade":3841},{"posicao":9,"modelo":"CAOA CHERY/TIGGO 5X","quantidade":3828},{"posicao":10,"modelo":"BYD/SONG","quantidade":3814},{"posicao":11,"modelo":"GM/ONIX","quantidade":3620},{"posicao":12,"modelo":"VW/POLO","quantidade":3510},{"posicao":13,"modelo":"VW/NIVUS","quantidade":3283},{"posicao":14,"modelo":"VW/T CROSS","quantidade":3165},{"posicao":15,"modelo":"FIAT/FASTBACK","quantidade":3064}],"Agosto/2026":[{"posicao":1,"modelo":"BYD/DOLPHIN","quantidade":5964},{"posicao":2,"modelo":"BYD/DOLPHIN MINI","quantidade":5820},{"posicao":3,"modelo":"GEELY/EX2","quantidade":5488},{"posicao":4,"modelo":"GWM/HAVAL H6","quantidade":5266},{"posicao":5,"modelo":"VW/TERA","quantidade":4560},{"posicao":6,"modelo":"BYD/SONG","quantidade":4121},{"posicao":7,"modelo":"GM/TRACKER","quantidade":4077},{"posicao":8,"modelo":"HYUNDAI/CRETA","quantidade":3763},{"posicao":9,"modelo":"GM/ONIX","quantidade":3555},{"posicao":10,"modelo":"VW/POLO","quantidade":3539},{"posicao":11,"modelo":"OMODA JAECOO/OMODA 5","quantidade":3344},{"posicao":12,"modelo":"TOYOTA/YARIS CROSS","quantidade":3325},{"posicao":13,"modelo":"CAOA CHERY/TIGGO 5X","quantidade":3258},{"posicao":14,"modelo":"VW/NIVUS","quantidade":2924},{"posicao":15,"modelo":"FIAT/FASTBACK","quantidade":2885}]},
+};
+
+// EN: traduz os rótulos de mês do eixo X (display-only; as chaves de D.varejo continuam em PT)
+if (LANG === 'en') D.labels = D.labels.map(mesShort);
+
+// ══════════════════════════════════════════════
+//  PALETA DE CORES
+// ══════════════════════════════════════════════
+const PAL = ['#FF5300','#E63946','#27AE60','#E67E22','#8E44AD','#16A085','#D35400','#2980B9','#C0392B','#1ABC9C'];
+const PAL_CHINESE = ['#E63946','#FF6B6B','#FF8E53','#FF4500','#C0392B','#8E44AD','#2980B9','#16A085','#F0A500'];
+
+function rgba(hex, a) {
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+const CHART_DEFAULTS = {
+  plugins: { legend: { labels: { font: { family: 'Segoe UI, Arial', size: 11 }, usePointStyle: true } } },
+  scales: {
+    x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+    y: { grid: { color: '#f0f0f0' }, ticks: { font: { size: 10 } } }
+  }
+};
+
+function fmt(n) { return n.toLocaleString(LOC()); }
+function pct(a, b) { return b ? ((a-b)/b*100).toFixed(1) : '—'; }
+
+// ══════════════════════════════════════════════
+//  KPI GERAL
+// ══════════════════════════════════════════════
+(function buildKpiGeral() {
+  const n = D.autos.length - 1;
+  const base = n - 12;
+  const last = D.autos[n];
+  const yoyV = D.yoyPct[n], momV = D.momPct[n];
+  const totalHibEle = D.hib[n] + D.ele[n];
+  const hibElePct = (totalHibEle / last * 100).toFixed(1);
+  const chShare = D.chShare[n];
+  const chDelta = (chShare - D.chShare[base]).toFixed(2);
+
+  document.getElementById('kpi-geral').innerHTML = `
+    <div class="kpi">
+      <div class="kpi-label">${t('Emplacamentos — Ago/2026','Registrations — Ago/2026')}</div>
+      <div class="kpi-value">${fmt(last)}</div>
+      <div class="kpi-delta ${yoyV>=0?'up':'down'}">${yoyV>=0?'▲':'▼'} ${Math.abs(yoyV)}% ${t('vs Ago/2025 (YoY)','vs Ago/2025 (YoY)')}</div>
+      <div class="kpi-delta ${momV>=0?'up':'down'}" style="margin-top:2px">${momV>=0?'▲':'▼'} ${Math.abs(momV)}% ${t('vs Jun/2026 (MoM)','vs Jun/2026 (MoM)')}</div>
+    </div>
+    <div class="kpi red">
+      <div class="kpi-label">${t('Market Share Chineses','Chinese Brands Market Share')}</div>
+      <div class="kpi-value">${chShare}%</div>
+      <div class="kpi-sub">+${chDelta} ${t('p.p. vs Ago/2025 · inclui Geely, GAC, OMODA','p.p. vs Ago/2025 · incl. Geely, GAC, OMODA')}</div>
+    </div>
+    <div class="kpi green">
+      <div class="kpi-label">${t('Eletrificados — Ago/2026','Electrified — Ago/2026')}</div>
+      <div class="kpi-value">${fmt(totalHibEle)}</div>
+      <div class="kpi-sub">${hibElePct}% ${t('dos autos emplacados','of cars registered')}</div>
+    </div>
+    <div class="kpi orange">
+      <div class="kpi-label">${t('Elétricos Puros — Ago/2026','Pure EVs — Ago/2026')}</div>
+      <div class="kpi-value">${fmt(D.ele[n])}</div>
+      <div class="kpi-delta up">▲ ${pct(D.ele[n], D.ele[base])}% ${t('vs Ago/2025','vs Ago/2025')}</div>
+    </div>
+  `;
+})();
+
+// ══════════════════════════════════════════════
+//  GRÁFICO: AUTOS TOTAL + YoY + MoM
+// ══════════════════════════════════════════════
+new Chart(document.getElementById('chartAutos'), {
+  type: 'bar',
+  data: {
+    labels: D.labels,
+    datasets: [
+      {
+        type: 'bar', label: t('Emplacamentos 2025/26','Registrations 2025/26'),
+        data: D.autos,
+        backgroundColor: rgba('#FF5300', .8), borderColor: '#FF5300',
+        borderWidth: 1, borderRadius: 4, order: 3
+      },
+      {
+        type: 'line', label: t('Crescimento YoY (%)','YoY Growth (%)'),
+        data: D.yoyPct,
+        borderColor: '#1a1a1a', backgroundColor: 'transparent',
+        borderWidth: 2.5, pointRadius: 5, tension: .3,
+        yAxisID: 'y2', order: 1
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { font: { family: 'Segoe UI, Arial', size: 11 }, usePointStyle: true } },
+      tooltip: { callbacks: { label: ctx => ctx.dataset.yAxisID === 'y2'
+        ? ' YoY: ' + ctx.raw + '%'
+        : ' ' + ctx.dataset.label + ': ' + fmt(ctx.raw) + t(' un.',' units')
+      }}
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+      y: { grid: { color: '#f0f0f0' }, ticks: { callback: v => fmt(v), font: { size: 10 } },
+           title: { display: true, text: t('Unidades','Units'), font: { size: 10 } } },
+      y2: { position: 'right', grid: { display: false },
+            ticks: { callback: v => v + '%', font: { size: 10 } },
+            title: { display: true, text: 'YoY %', font: { size: 10 } } }
+    }
+  }
+});
+
+// ══════════════════════════════════════════════
+//  GRÁFICO INTERATIVO: MARCAS CHINESAS + SHARE
+// ══════════════════════════════════════════════
+(function() {
+  const palCh = ['#C0392B','#E07B54','#D35400','#E67E22','#F0A500','#8B6914','#8E44AD','#2980B9','#16A085'];
+
+  // Marcas ordenadas por volume total, sem JAECOO (fundido em OMODA JAECOO)
+  const allNames = Object.keys(D.chMarcas)
+    .filter(m => m !== 'JAECOO' && D.chMarcas[m].some(v => v > 0))
+    .sort((a, b) => D.chMarcas[b].reduce((s,v)=>s+v,0) - D.chMarcas[a].reduce((s,v)=>s+v,0));
+
+  const colorMap = {};
+  allNames.forEach((m, i) => colorMap[m] = palCh[i % palCh.length]);
+
+  // Estado: todas ativas por padrão
+  const active = new Set(allNames);
+
+  // Calcular share só das marcas ativas
+  function calcShare() {
+    return D.autos.map((tot, i) => {
+      const chTot = allNames.filter(m => active.has(m)).reduce((s, m) => s + (D.chMarcas[m][i] || 0), 0);
+      return +(chTot / tot * 100).toFixed(2);
+    });
+  }
+
+  // Montar datasets
+  function buildDatasets() {
+    const barDS = allNames.map(m => ({
+      type: 'bar',
+      label: m,
+      data: active.has(m) ? D.chMarcas[m] : D.chMarcas[m].map(() => 0),
+      backgroundColor: colorMap[m],
+      stack: 'chineses',
+      borderWidth: 0,
+      order: 2,
+    }));
+    const lineDS = {
+      type: 'line',
+      label: active.size === allNames.length ? t('Market Share Total (%)','Total Market Share (%)') : t('Market Share Selecionadas (%)','Selected Market Share (%)'),
+      data: calcShare(),
+      borderColor: '#1a1a1a',
+      backgroundColor: 'transparent',
+      borderWidth: 2.5,
+      pointRadius: 5,
+      pointBackgroundColor: '#1a1a1a',
+      tension: .3,
+      yAxisID: 'y2',
+      order: 1,
+    };
+    return [...barDS, lineDS];
+  }
+
+  // Criar gráfico
+  const chartChBrands = new Chart(document.getElementById('chartStack'), {
+    type: 'bar',
+    data: { labels: D.labels, datasets: buildDatasets() },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.dataset.yAxisID === 'y2'
+              ? ' Market Share: ' + ctx.raw + '%'
+              : ' ' + ctx.dataset.label + ': ' + fmt(ctx.raw),
+            footer: items => {
+              const bars = items.filter(i => i.dataset.yAxisID !== 'y2' && i.raw > 0);
+              return bars.length ? t(' Total seleção: ',' Selection total: ') + fmt(bars.reduce((s, i) => s + i.raw, 0)) : '';
+            }
+          }
+        }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 } } },
+        y: { stacked: true, grid: { color: '#f0f0f0' },
+             ticks: { callback: v => fmt(v), font: { size: 10 } },
+             title: { display: true, text: t('Unidades','Units'), font: { size: 10 }, color: '#6b7280' } },
+        y2: { position: 'right', grid: { display: false }, min: 0, max: 30,
+              ticks: { callback: v => v + '%', font: { size: 10 } },
+              title: { display: true, text: 'Market Share', font: { size: 10 }, color: '#1a1a1a' } }
+      }
+    }
+  });
+
+  // Atualizar nota de share
+  function updateNote() {
+    const shareArr = calcShare();
+    const last = shareArr[shareArr.length - 1];
+    const note = active.size === allNames.length
+      ? t(`Market share total das marcas chinesas em Ago/2026: <strong>${last}%</strong>`, `Total Chinese brands market share in Ago/2026: <strong>${last}%</strong>`)
+      : t(`Market share das marcas selecionadas em Ago/2026: <strong>${last}%</strong> (de ${D.chShare[D.chShare.length-1]}% total)`, `Selected brands market share in Ago/2026: <strong>${last}%</strong> (of ${D.chShare[D.chShare.length-1]}% total)`);
+    document.getElementById('shareNote').innerHTML = note;
+  }
+
+  // Criar botões de toggle
+  function buildToggles() {
+    const container = document.getElementById('chBrandToggles');
+    container.innerHTML = '';
+
+    // Botão "Todas"
+    const allBtn = document.createElement('button');
+    allBtn.className = 'brand-btn on';
+    allBtn.textContent = t('✓ Todas','✓ All');
+    allBtn.style.borderColor = '#1a1a1a';
+    allBtn.style.background = active.size === allNames.length ? '#1a1a1a' : 'transparent';
+    allBtn.style.color = active.size === allNames.length ? '#fff' : '#1a1a1a';
+    allBtn.style.opacity = '1';
+    allBtn.onclick = () => {
+      if (active.size === allNames.length) {
+        active.clear();
+      } else {
+        allNames.forEach(m => active.add(m));
+      }
+      refresh();
+    };
+    container.appendChild(allBtn);
+
+    allNames.forEach(m => {
+      const btn = document.createElement('button');
+      const col = colorMap[m];
+      btn.className = 'brand-btn' + (active.has(m) ? ' on' : '');
+      btn.textContent = m;
+      btn.style.borderColor = col;
+      btn.style.backgroundColor = active.has(m) ? col : 'transparent';
+      btn.style.color = active.has(m) ? '#fff' : col;
+      btn.onclick = () => {
+        if (active.has(m)) active.delete(m); else active.add(m);
+        refresh();
+      };
+      container.appendChild(btn);
+    });
+  }
+
+  function refresh() {
+    const newDS = buildDatasets();
+    chartChBrands.data.datasets.forEach((ds, i) => {
+      ds.data = newDS[i].data;
+      if (newDS[i].label) ds.label = newDS[i].label;
+    });
+    chartChBrands.update();
+    buildToggles();
+    updateNote();
+  }
+
+  buildToggles();
+  updateNote();
+})();
+
+// ══════════════════════════════════════════════
+//  GRÁFICO: CRESCIMENTO YoY MERCADO TOTAL (GERAL)
+// ══════════════════════════════════════════════
+new Chart(document.getElementById('chartEletriGeral'), {
+  type: 'bar',
+  data: {
+    labels: D.labels,
+    datasets: [{
+      label: t('Crescimento YoY (%)','YoY Growth (%)'),
+      data: D.yoyPct,
+      backgroundColor: D.yoyPct.map(v => v >= 0 ? rgba('#FF5300', .8) : rgba('#E63946', .8)),
+      borderColor:     D.yoyPct.map(v => v >= 0 ? '#FF5300' : '#E63946'),
+      borderWidth: 1, borderRadius: 4,
+    }]
+  },
+  options: { responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ' YoY: ' + ctx.raw + '%' } }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+      y: { grid: { color: '#f0f0f0' },
+           ticks: { callback: v => v + '%', font: { size: 10 } } }
+    }
+  }
+});
+
+// ══════════════════════════════════════════════
+//  MARCAS — LINHA
+// ══════════════════════════════════════════════
+let marcasModo = 'empl', chartMarcas = null;
+function buildMarcas() {
+  const share = marcasModo === 'share';
+  const datasets = D.top8.map((m, i) => ({
+    label: m,
+    data: D.marcas[m].map((v, idx) => share ? +(v / D.autos[idx] * 100).toFixed(2) : v),
+    borderColor: PAL[i], backgroundColor: 'transparent',
+    borderWidth: 2, pointRadius: 4, tension: .3
+  }));
+  if (chartMarcas) chartMarcas.destroy();
+  chartMarcas = new Chart(document.getElementById('chartMarcas'), {
+    type: 'line',
+    data: { labels: D.labels, datasets },
+    options: { ...CHART_DEFAULTS, responsive: true, maintainAspectRatio: false,
+      plugins: { ...CHART_DEFAULTS.plugins, tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + (share ? ctx.raw + '%' : fmt(ctx.raw)) } } },
+      scales: { ...CHART_DEFAULTS.scales, y: { ...CHART_DEFAULTS.scales.y, ticks: { callback: v => share ? v + '%' : fmt(v) } } }
+    }
+  });
+}
+function setMarcasModo(m) {
+  marcasModo = m;
+  document.getElementById('marcasModoEmpl').classList.toggle('on', m === 'empl');
+  document.getElementById('marcasModoShare').classList.toggle('on', m === 'share');
+  buildMarcas();
+}
+buildMarcas();
+
+// MARCAS — BAR último mês
+(function() {
+  const n = D.autos.length - 1;
+  const sorted = [...D.top8].sort((a,b) => D.marcas[b][n] - D.marcas[a][n]);
+  new Chart(document.getElementById('chartMarcasBar'), {
+    type: 'bar',
+    data: {
+      labels: sorted,
+      datasets: [{ label: mesShort('Ago/2026'), data: sorted.map(m => D.marcas[m][n]), backgroundColor: sorted.map((_,i) => PAL[i]) }]
+    },
+    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + fmt(ctx.raw) } } },
+      scales: { x: { grid: { color: '#f0f0f0' }, ticks: { callback: v => fmt(v), font: { size: 10 } } },
+                 y: { grid: { display: false }, ticks: { font: { size: 11 } } } }
+    }
+  });
+})();
+
+// MARCAS — PIE último mês
+(function() {
+  const n = D.autos.length - 1;
+  new Chart(document.getElementById('chartMarcasPie'), {
+    type: 'doughnut',
+    data: {
+      labels: D.top8,
+      datasets: [{ data: D.top8.map(m => D.marcas[m][n]), backgroundColor: PAL, borderWidth: 2, borderColor: '#fff' }]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'right', labels: { font: { size: 11 }, usePointStyle: true } },
+        tooltip: { callbacks: { label: ctx => ' ' + ctx.label + ': ' + fmt(ctx.raw) + ' (' + (ctx.raw/D.autos[n]*100).toFixed(1) + '%)' } }
+      }
+    }
+  });
+})();
+
+// ══════════════════════════════════════════════
+//  CHINESES — KPI
+// ══════════════════════════════════════════════
+(function() {
+  const n = D.autos.length - 1, n0 = n - 12;
+  const shareGrowth = (D.chShare[n] - D.chShare[n0]).toFixed(2);
+  const chGrowth = pct(D.ch[n], D.ch[n0]);
+  document.getElementById('kpi-chineses').innerHTML = `
+    <div class="kpi red"><div class="kpi-label">${t('Share Chineses — Ago/2026','Chinese Share — Ago/2026')}</div>
+      <div class="kpi-value">${D.chShare[n]}%</div>
+      <div class="kpi-delta up">▲ +${shareGrowth} ${t('p.p. vs Ago/2025','p.p. vs Ago/2025')}</div></div>
+    <div class="kpi red"><div class="kpi-label">${t('Volume Chineses — Ago/2026','Chinese Volume — Ago/2026')}</div>
+      <div class="kpi-value">${fmt(D.ch[n])}</div>
+      <div class="kpi-delta up">▲ +${chGrowth}% ${t('vs Ago/2025','vs Ago/2025')}</div></div>
+    <div class="kpi"><div class="kpi-label">${t('ex-Chineses — Ago/2026','Non-Chinese — Ago/2026')}</div>
+      <div class="kpi-value">${fmt(D.excl[n])}</div>
+      <div class="kpi-delta ${pct(D.excl[n],D.excl[n0])>=0?'up':'down'}">${+pct(D.excl[n],D.excl[n0])>=0?'▲':'▼'} ${Math.abs(pct(D.excl[n],D.excl[n0]))}% ${t('vs Ago/2025','vs Ago/2025')}</div></div>
+    <div class="kpi red"><div class="kpi-label">${t('BYD — Share nos Chineses','BYD — Share of Chinese')}</div>
+      <div class="kpi-value">${(D.chMarcas.BYD[n]/D.ch[n]*100).toFixed(1)}%</div>
+      <div class="kpi-sub">${t('Maior marca chinesa','Largest Chinese brand')}</div></div>
+  `;
+  document.getElementById('insight-ch').innerHTML = t(
+    `<strong>📈 Avanço expressivo:</strong> Incluindo Geely, GAC e OMODA JAECOO, os chineses saltaram de <strong>${D.chShare[n0]}%</strong> (Ago/2025) para <strong>${D.chShare[n]}%</strong> (Ago/2026) — <strong>+${shareGrowth} pontos percentuais</strong> em 1 ano. BYD lidera com ${fmt(D.chMarcas.BYD[n])} unidades, seguida de GWM (${fmt(D.chMarcas.GWM[n])}), CAOA CHERY (${fmt(D.chMarcas['CAOA CHERY'][n])}) e Geely, que saiu do zero para ${fmt(D.chMarcas.GEELY[n])} unidades em apenas 7 meses.`,
+    `<strong>📈 Strong advance:</strong> Including Geely, GAC and OMODA JAECOO, Chinese brands jumped from <strong>${D.chShare[n0]}%</strong> (Ago/2025) to <strong>${D.chShare[n]}%</strong> (Ago/2026) — <strong>+${shareGrowth} percentage points</strong> in one year. BYD leads with ${fmt(D.chMarcas.BYD[n])} units, followed by GWM (${fmt(D.chMarcas.GWM[n])}), CAOA CHERY (${fmt(D.chMarcas['CAOA CHERY'][n])}) and Geely, which went from zero to ${fmt(D.chMarcas.GEELY[n])} units in just 7 months.`);
+})();
+
+// CHINESES — SHARE LINE
+new Chart(document.getElementById('chartChShare'), {
+  type: 'line',
+  data: {
+    labels: D.labels,
+    datasets: [{
+      label: t('Market Share (%)','Market Share (%)'),
+      data: D.chShare,
+      borderColor: '#E63946', backgroundColor: rgba('#E63946',.12), fill: true,
+      borderWidth: 2.5, pointRadius: 5, tension: .3
+    }]
+  },
+  options: { ...CHART_DEFAULTS, responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.raw + '%' } } },
+    scales: { x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+               y: { grid: { color: '#f0f0f0' }, ticks: { callback: v => v + '%', font: { size: 10 } }, min: 8, max: 30 } }
+  }
+});
+
+// CHINESES — STACK
+new Chart(document.getElementById('chartChStack'), {
+  type: 'bar',
+  data: {
+    labels: D.labels,
+    datasets: [
+      { label: t('ex-Chineses','Non-Chinese'), data: D.excl, backgroundColor: '#FF5300', stack: 's' },
+      { label: t('Chineses','Chinese'), data: D.ch, backgroundColor: '#E63946', stack: 's' },
+    ]
+  },
+  options: { ...CHART_DEFAULTS, responsive: true, maintainAspectRatio: false,
+    plugins: { ...CHART_DEFAULTS.plugins, tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + fmt(ctx.raw) } } },
+    scales: { x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 } } },
+               y: { stacked: true, grid: { color: '#f0f0f0' }, ticks: { callback: v => fmt(v), font: { size: 10 } } } }
+  }
+});
+
+// CHINESES — POR MARCA LINHA
+(function() {
+  const names = Object.keys(D.chMarcas).filter(m => D.chMarcas[m].some(v=>v>0));
+  new Chart(document.getElementById('chartChMarcas'), {
+    type: 'line',
+    data: {
+      labels: D.labels,
+      datasets: names.map((m,i) => ({
+        label: m, data: D.chMarcas[m],
+        borderColor: PAL_CHINESE[i], backgroundColor: 'transparent',
+        borderWidth: 2.5, pointRadius: 4, tension: .3
+      }))
+    },
+    options: { ...CHART_DEFAULTS, responsive: true, maintainAspectRatio: false,
+      plugins: { ...CHART_DEFAULTS.plugins, tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + fmt(ctx.raw) } } },
+      scales: { ...CHART_DEFAULTS.scales, y: { ...CHART_DEFAULTS.scales.y, ticks: { callback: v => fmt(v) } } }
+    }
+  });
+})();
+
+// CHINESES — GROWTH COMPARISON
+(function() {
+  const chGrowth = D.ch.map((v,i) => i===0 ? null : +pct(v, D.ch[i-1]));
+  const exGrowth = D.excl.map((v,i) => i===0 ? null : +pct(v, D.excl[i-1]));
+  new Chart(document.getElementById('chartChGrowth'), {
+    type: 'line',
+    data: {
+      labels: D.labels,
+      datasets: [
+        { label: t('Crescimento Chineses (%)','Chinese Growth (%)'), data: chGrowth, borderColor: '#E63946', backgroundColor: 'transparent', borderWidth: 2, pointRadius: 4, tension: .3 },
+        { label: t('Crescimento ex-Chineses (%)','Non-Chinese Growth (%)'), data: exGrowth, borderColor: '#FF5300', backgroundColor: 'transparent', borderWidth: 2, pointRadius: 4, tension: .3 },
+      ]
+    },
+    options: { ...CHART_DEFAULTS, responsive: true, maintainAspectRatio: false,
+      plugins: { ...CHART_DEFAULTS.plugins, tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label.replace(/\s*\(%\)/,'') + ': ' + ctx.raw + '%' } } },
+      scales: { x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+                 y: { grid: { color: '#f0f0f0' }, ticks: { callback: v => v + '%', font: { size: 10 } } } }
+    }
+  });
+})();
+
+// CHINESES — PIE último mês
+(function() {
+  const n = D.autos.length - 1;
+  const names = Object.keys(D.chMarcas).filter(m => D.chMarcas[m][n] > 0);
+  new Chart(document.getElementById('chartChPie'), {
+    type: 'doughnut',
+    data: {
+      labels: names,
+      datasets: [{ data: names.map(m => D.chMarcas[m][n]), backgroundColor: PAL_CHINESE, borderWidth: 2, borderColor: '#fff' }]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'right', labels: { font: { size: 11 }, usePointStyle: true } },
+        tooltip: { callbacks: { label: ctx => ' ' + ctx.label + ': ' + fmt(ctx.raw) + ' (' + (ctx.raw/D.ch[n]*100).toFixed(1) + '%)' } }
+      }
+    }
+  });
+})();
+
+// ══════════════════════════════════════════════
+//  ELETRIFICADOS — KPI
+// ══════════════════════════════════════════════
+(function() {
+  const n = D.hib.length - 1;
+  const base = n - 12;
+  const totLast = D.hib[n]+D.ele[n], tot0 = D.hib[base]+D.ele[base];
+  document.getElementById('kpi-eletri').innerHTML = `
+    <div class="kpi green"><div class="kpi-label">${t('Total Eletrificados — Ago/2026','Total Electrified — Ago/2026')}</div>
+      <div class="kpi-value">${fmt(totLast)}</div>
+      <div class="kpi-delta up">▲ +${pct(totLast,tot0)}% ${t('vs Ago/2025','vs Ago/2025')}</div></div>
+    <div class="kpi green"><div class="kpi-label">${t('Híbridos — Ago/2026','Hybrids — Ago/2026')}</div>
+      <div class="kpi-value">${fmt(D.hib[n])}</div>
+      <div class="kpi-delta up">▲ +${pct(D.hib[n],D.hib[base])}% ${t('vs Ago/2025','vs Ago/2025')}</div></div>
+    <div class="kpi green"><div class="kpi-label">${t('Elétricos — Ago/2026','EVs — Ago/2026')}</div>
+      <div class="kpi-value">${fmt(D.ele[n])}</div>
+      <div class="kpi-delta up">▲ +${pct(D.ele[n],D.ele[base])}% ${t('vs Ago/2025','vs Ago/2025')}</div></div>
+    <div class="kpi"><div class="kpi-label">${t('Share Eletrificados — Ago/2026','Electrified Share — Ago/2026')}</div>
+      <div class="kpi-value">${(totLast/D.autos[n]*100).toFixed(1)}%</div>
+      <div class="kpi-sub">${t('do total de automóveis','of total passenger cars')}</div></div>
+  `;
+  document.getElementById('insight-ele').innerHTML = t(
+    `<strong>⚡ Crescimento acelerado:</strong> Os eletrificados mais que dobraram de ${fmt(tot0)} em Ago/2025 para ${fmt(totLast)} em Ago/2026 (+${pct(totLast,tot0)}%). O BYD domina tanto no segmento elétrico puro quanto no híbrido. Destaque para a <strong>Geely/ZEEKR</strong>, que saiu do zero e chegou a ${fmt(D.eleMarcas.GEELY[n])} elétricos em Ago/2026.`,
+    `<strong>⚡ Accelerated growth:</strong> Electrified vehicles more than doubled from ${fmt(tot0)} in Ago/2025 to ${fmt(totLast)} in Ago/2026 (+${pct(totLast,tot0)}%). BYD dominates both the pure-EV and hybrid segments. Highlight for <strong>Geely/ZEEKR</strong>, which went from zero to ${fmt(D.eleMarcas.GEELY[n])} EVs in Ago/2026.`);
+})();
+
+// ELETRIFICADOS — LINHA
+new Chart(document.getElementById('chartEletri'), {
+  type: 'line',
+  data: {
+    labels: D.labels,
+    datasets: [
+      { label: t('Híbridos','Hybrids'), data: D.hib, borderColor: '#27AE60', backgroundColor: rgba('#27AE60',.12), fill: true, tension: .3, borderWidth: 2.5, pointRadius: 5 },
+      { label: t('Elétricos','EVs'), data: D.ele, borderColor: '#1ABC9C', backgroundColor: rgba('#1ABC9C',.15), fill: true, tension: .3, borderWidth: 2.5, pointRadius: 5 },
+    ]
+  },
+  options: { ...CHART_DEFAULTS, responsive: true, maintainAspectRatio: false,
+    plugins: { ...CHART_DEFAULTS.plugins, tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + fmt(ctx.raw) } } },
+    scales: { ...CHART_DEFAULTS.scales, y: { ...CHART_DEFAULTS.scales.y, ticks: { callback: v => fmt(v) } } }
+  }
+});
+
+// HÍBRIDOS — POR MARCA
+(function() {
+  const names = Object.keys(D.hibMarcas);
+  const colors = ['#E63946','#FF5300','#E67E22','#8E44AD','#16A085','#27AE60'];
+  new Chart(document.getElementById('chartHib'), {
+    type: 'line',
+    data: { labels: D.labels, datasets: names.map((m,i) => ({ label: m, data: D.hibMarcas[m], borderColor: colors[i], backgroundColor: 'transparent', borderWidth: 2, pointRadius: 3, tension: .3 })) },
+    options: { ...CHART_DEFAULTS, responsive: true, maintainAspectRatio: false,
+      plugins: { ...CHART_DEFAULTS.plugins, tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + fmt(ctx.raw) } } },
+      scales: { ...CHART_DEFAULTS.scales, y: { ...CHART_DEFAULTS.scales.y, ticks: { callback: v => fmt(v) } } }
+    }
+  });
+})();
+
+// ELÉTRICOS — POR MARCA
+(function() {
+  const names = Object.keys(D.eleMarcas);
+  const colors = ['#E63946','#8E44AD','#FF5300','#E67E22','#16A085'];
+  new Chart(document.getElementById('chartEle'), {
+    type: 'line',
+    data: { labels: D.labels, datasets: names.map((m,i) => ({ label: m, data: D.eleMarcas[m], borderColor: colors[i], backgroundColor: 'transparent', borderWidth: 2, pointRadius: 3, tension: .3 })) },
+    options: { ...CHART_DEFAULTS, responsive: true, maintainAspectRatio: false,
+      plugins: { ...CHART_DEFAULTS.plugins, tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + fmt(ctx.raw) } } },
+      scales: { ...CHART_DEFAULTS.scales, y: { ...CHART_DEFAULTS.scales.y, ticks: { callback: v => fmt(v) } } }
+    }
+  });
+})();
+
+// ══════════════════════════════════════════════
+//  MARCAS — YoY POR MODELO (VAREJO)
+// ══════════════════════════════════════════════
+let chartYoyModelos = null;
+
+// Calcular YoY: Agosto/2026 vs Agosto/2025
+const yoyModels = (() => {
+  const now  = D.varejo['Agosto/2026'] || [];
+  const prev = D.varejo['Agosto/2025'] || [];
+  const prevMap = {};
+  prev.forEach(m => prevMap[m.modelo] = m.quantidade);
+
+  return now
+    .filter(m => prevMap[m.modelo] !== undefined)
+    .map(m => ({
+      modelo: m.modelo,
+      atual:  m.quantidade,
+      anterior: prevMap[m.modelo],
+      yoy: +((m.quantidade / prevMap[m.modelo] - 1) * 100).toFixed(1)
+    }))
+    .sort((a, b) => b.yoy - a.yoy);
+})();
+
+function updateYoyChart() {
+  const filter = document.getElementById('yoyModelFilter').value;
+  const top    = parseInt(document.getElementById('yoyModelTop').value);
+
+  let data = [...yoyModels];
+  if (filter === 'pos') data = data.filter(m => m.yoy >= 0);
+  if (filter === 'neg') data = data.filter(m => m.yoy < 0).sort((a,b) => a.yoy - b.yoy);
+
+  // Para "all": mostrar top N crescimento + top N queda
+  if (filter === 'all') {
+    const pos = data.filter(m => m.yoy >= 0).slice(0, Math.ceil(top / 2));
+    const neg = data.filter(m => m.yoy <  0).sort((a,b) => a.yoy - b.yoy).slice(0, Math.floor(top / 2));
+    data = [...neg, ...pos];  // negativos embaixo, positivos em cima
+  } else {
+    data = data.slice(0, top);
+    if (filter === 'neg') data.reverse();  // piores no topo
+  }
+
+  const labels  = data.map(m => m.modelo);
+  const values  = data.map(m => m.yoy);
+  const colors  = values.map(v => v >= 0 ? rgba('#27AE60', .85) : rgba('#E63946', .85));
+  const borders = values.map(v => v >= 0 ? '#27AE60' : '#E63946');
+
+  if (chartYoyModelos) chartYoyModelos.destroy();
+  chartYoyModelos = new Chart(document.getElementById('chartYoyModelos'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: t('Crescimento YoY (%)','YoY Growth (%)'),
+        data: values,
+        backgroundColor: colors,
+        borderColor: borders,
+        borderWidth: 1,
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const m = data[ctx.dataIndex];
+              return [
+                ` YoY: ${ctx.raw > 0 ? '+' : ''}${ctx.raw}%`,
+                ` ${t('Ago/2026','Ago/2026')}: ${fmt(m.atual)}${t(' un.',' units')}`,
+                ` ${t('Ago/2025','Ago/2025')}: ${fmt(m.anterior)}${t(' un.',' units')}`,
+              ];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: '#f0f0f0' },
+          ticks: { callback: v => v + '%', font: { size: 10 } },
+          title: { display: true, text: t('Crescimento YoY (%)','YoY Growth (%)'), font: { size: 10 }, color: '#6b7280' }
+        },
+        y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+      }
+    }
+  });
+}
+updateYoyChart();
+
+// ══════════════════════════════════════════════
+//  VAREJO
+// ══════════════════════════════════════════════
+let chartVarejo = null, chartModelEvol = null;
+const varejoRefs = D.labelsLong;
+
+// Preencher selects
+const sel = document.getElementById('varejoSelect');
+const sel2 = document.getElementById('varejoSelect2');
+varejoRefs.forEach(ref => {
+  const o = document.createElement('option'); o.value = ref; o.textContent = mesLong(ref); sel.appendChild(o);
+  const o2 = document.createElement('option'); o2.value = ref; o2.textContent = mesLong(ref); sel2.appendChild(o2);
+});
+sel.value = varejoRefs[varejoRefs.length - 1];
+
+function updateVarejo() {
+  const ref1 = sel.value, ref2 = sel2.value;
+  const d1v = D.varejo[ref1] || [];
+  const d2v = ref2 ? D.varejo[ref2] : null;
+
+  const labels1 = d1v.map(m => m.modelo);
+  const vals1 = d1v.map(m => m.quantidade);
+
+  // Reindex d2 to match d1 labels
+  const vals2 = d2v ? labels1.map(lbl => { const f = d2v.find(m=>m.modelo===lbl); return f ? f.quantidade : 0; }) : null;
+
+  document.getElementById('varejoTitle').textContent = `${t('Top 15 Modelos','Top 15 Models')} — ${mesLong(ref1)}${ref2?' vs '+mesLong(ref2):''}`;
+
+  const datasets = [{ label: ref1, data: vals1, backgroundColor: rgba('#FF5300',.8) }];
+  if (vals2) datasets.push({ label: ref2, data: vals2, backgroundColor: rgba('#E63946',.7) });
+
+  if (chartVarejo) chartVarejo.destroy();
+  chartVarejo = new Chart(document.getElementById('chartVarejo'), {
+    type: 'bar',
+    data: { labels: labels1, datasets },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: !!ref2, labels: { font: { size: 11 }, usePointStyle: true } },
+        tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + fmt(ctx.raw) } } },
+      scales: { x: { grid: { color: '#f0f0f0' }, ticks: { callback: v => fmt(v), font: { size: 10 } } },
+                 y: { grid: { display: false }, ticks: { font: { size: 11 } } } }
+    }
+  });
+}
+updateVarejo();
+
+// Modelo evolution selector
+const allModelos = [...new Set(Object.values(D.varejo).flatMap(v => v.map(m => m.modelo)))].sort();
+const defaultModels = ['BYD/SONG','BYD/DOLPHIN MINI','HYUNDAI/CRETA','VW/POLO','GM/ONIX','CAOA CHERY/TIGGO 7'];
+let selectedModels = new Set(defaultModels);
+
+function buildModelSelector() {
+  const container = document.getElementById('modelSelector');
+  container.innerHTML = '';
+  allModelos.forEach(m => {
+    const btn = document.createElement('button');
+    btn.textContent = m;
+    btn.style.cssText = `padding:4px 10px;border-radius:20px;border:1.5px solid ${selectedModels.has(m)?'#FF5300':'#d1d5db'};background:${selectedModels.has(m)?'#FF5300':'#fff'};color:${selectedModels.has(m)?'#fff':'#374151'};font-size:.72rem;cursor:pointer;transition:all .15s`;
+    btn.onclick = () => {
+      if (selectedModels.has(m)) selectedModels.delete(m); else selectedModels.add(m);
+      buildModelSelector(); updateModelEvol();
+    };
+    container.appendChild(btn);
+  });
+}
+
+function updateModelEvol() {
+  const models = [...selectedModels];
+  const pal2 = ['#FF5300','#E63946','#27AE60','#E67E22','#8E44AD','#16A085','#D35400','#2980B9','#C0392B','#1ABC9C'];
+  const datasets = models.map((m, i) => ({
+    label: m,
+    data: varejoRefs.map(ref => { const f = (D.varejo[ref]||[]).find(r=>r.modelo===m); return f ? f.quantidade : null; }),
+    borderColor: pal2[i%pal2.length], backgroundColor: 'transparent',
+    borderWidth: 2, pointRadius: 4, tension: .3, spanGaps: false
+  }));
+  if (chartModelEvol) chartModelEvol.destroy();
+  chartModelEvol = new Chart(document.getElementById('chartModelEvol'), {
+    type: 'line',
+    data: { labels: D.labels, datasets },
+    options: { ...CHART_DEFAULTS, responsive: true, maintainAspectRatio: false,
+      plugins: { ...CHART_DEFAULTS.plugins, tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + fmt(ctx.raw) } } },
+      scales: { ...CHART_DEFAULTS.scales, y: { ...CHART_DEFAULTS.scales.y, ticks: { callback: v => fmt(v) } } }
+    }
+  });
+}
+buildModelSelector();
+updateModelEvol();
+
+// ══════════════════════════════════════════════
+//  DOWNLOAD CSV
+// ══════════════════════════════════════════════
+function triggerDownload(csv, filename) {
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function dlCSV(canvasId, filename) {
+  // Caso especial: YoY modelos (dados filtrados dinamicamente)
+  if (canvasId === 'chartYoyModelos') {
+    const filter = document.getElementById('yoyModelFilter').value;
+    const top    = parseInt(document.getElementById('yoyModelTop').value);
+    let data = [...yoyModels];
+    if (filter === 'pos') data = data.filter(m => m.yoy >= 0);
+    if (filter === 'neg') data = data.filter(m => m.yoy < 0).sort((a,b) => a.yoy - b.yoy);
+    if (filter === 'all') {
+      const pos = data.filter(m => m.yoy >= 0).slice(0, Math.ceil(top/2));
+      const neg = data.filter(m => m.yoy < 0).sort((a,b) => a.yoy-b.yoy).slice(0, Math.floor(top/2));
+      data = [...neg.reverse(), ...pos];
+    } else { data = data.slice(0, top); }
+    let csv = 'Modelo,Ago/2026,Ago/2025,Crescimento YoY (%)\n';
+    data.forEach(m => { csv += `"${m.modelo}",${m.atual},${m.anterior},${m.yoy}\n`; });
+    return triggerDownload(csv, filename + '.csv');
+  }
+
+  // Caso especial: gráfico de varejo (dados do mês selecionado)
+  if (canvasId === 'chartVarejo') {
+    const ref1 = document.getElementById('varejoSelect').value;
+    const ref2 = document.getElementById('varejoSelect2').value;
+    const d1v  = D.varejo[ref1] || [];
+    let csv = ref2
+      ? `Posição,Modelo,${ref1},${ref2}\n`
+      : `Posição,Modelo,${ref1}\n`;
+    d1v.forEach(m => {
+      const v2 = ref2 ? (D.varejo[ref2] || []).find(r => r.modelo === m.modelo) : null;
+      csv += ref2
+        ? `${m.posicao},"${m.modelo}",${m.quantidade},${v2 ? v2.quantidade : ''}\n`
+        : `${m.posicao},"${m.modelo}",${m.quantidade}\n`;
+    });
+    return triggerDownload(csv, filename + '.csv');
+  }
+
+  // Caso especial: evolução de modelos varejo (dados das séries selecionadas)
+  if (canvasId === 'chartModelEvol') {
+    const models = [...selectedModels];
+    let csv = 'Período,' + models.map(m => `"${m}"`).join(',') + '\n';
+    D.labelsLong.forEach((ref, i) => {
+      const vals = models.map(m => {
+        const f = (D.varejo[ref] || []).find(r => r.modelo === m);
+        return f ? f.quantidade : '';
+      });
+      csv += `"${ref}",${vals.join(',')}\n`;
+    });
+    return triggerDownload(csv, filename + '.csv');
+  }
+
+  // Caso geral: extrair dados direto do Chart.js
+  const chart = Chart.getChart(document.getElementById(canvasId));
+  if (!chart) return;
+
+  const labels   = chart.data.labels || [];
+  const datasets = chart.data.datasets.filter(ds => ds.data && ds.data.length);
+
+  let csv = '"Período",' + datasets.map(ds => `"${(ds.label || '').replace(/"/g, '""')}"`).join(',') + '\n';
+  labels.forEach((label, i) => {
+    const vals = datasets.map(ds => {
+      const v = ds.data[i];
+      return (v === null || v === undefined) ? '' : v;
+    });
+    csv += `"${label}",${vals.join(',')}\n`;
+  });
+  triggerDownload(csv, filename + '.csv');
+}
+
+// Mapeamento canvas → nome do arquivo
+const DL_MAP = {
+  chartAutos:       'emplacamentos_autos',
+  chartStack:       'marcas_chinesas_share',
+  chartEletriGeral: 'yoy_mercado_total',
+  chartMarcas:      'evolucao_marcas',
+  chartMarcasBar:   'ranking_marcas_mai2026',
+  chartMarcasPie:   'share_marcas_mai2026',
+  chartYoyModelos:  'yoy_modelos_varejo',
+  chartChShare:     'share_chineses',
+  chartChStack:     'chineses_vs_excluidos',
+  chartChMarcas:    'evolucao_marcas_chinesas',
+  chartChGrowth:    'crescimento_chineses_exch',
+  chartChPie:       'share_chineses_mai2026',
+  chartEletri:      'eletrificados_evolucao',
+  chartHib:         'hibridos_por_marca',
+  chartEle:         'eletricos_por_marca',
+  chartVarejo:      'varejo_modelos',
+  chartModelEvol:   'evolucao_modelos_varejo',
+};
+
+const dlIcon = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v8M5 7l3 3 3-3M3 12h10"/></svg>`;
+
+function addDownloadButtons() {
+  Object.entries(DL_MAP).forEach(([canvasId, filename]) => {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const card = canvas.closest('.chart-card');
+    if (!card) return;
+    const titleEl = card.querySelector('.chart-title');
+    if (!titleEl || titleEl.closest('.chart-header')) return; // já processado
+
+    // Criar header flex
+    const header = document.createElement('div');
+    header.className = 'chart-header';
+    const left = document.createElement('div');
+    left.className = 'chart-header-left';
+
+    // Mover título (e subtitle se existir) para o left
+    const sub = titleEl.nextElementSibling;
+    titleEl.parentNode.insertBefore(header, titleEl);
+    left.appendChild(titleEl);
+    if (sub && sub.classList.contains('chart-sub')) left.appendChild(sub);
+    header.appendChild(left);
+
+    // Botão de download
+    const btn = document.createElement('button');
+    btn.className = 'dl-btn';
+    btn.innerHTML = dlIcon + ' CSV';
+    btn.title = t('Baixar dados deste gráfico','Download this chart\'s data');
+    btn.onclick = () => dlCSV(canvasId, filename);
+    header.appendChild(btn);
+  });
+}
+
+// Aguarda os gráficos renderizarem antes de adicionar os botões
+setTimeout(addDownloadButtons, 300);
+
+// ══════════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════════
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</div><!-- /app -->
+</body>
+</html>
+<!-- build-marker: dados ate Agosto/2026 | re-save 2026-09-03 -->
