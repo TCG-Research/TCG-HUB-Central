@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>FIPE — Depreciação & Spread Novo vs Seminovo</title>
+<title data-en="FIPE — Depreciation &amp; New vs Used Spread">FIPE — Depreciação & Spread Novo vs Seminovo</title>
 <script src="chart.umd.min.js"></script>
 <script src="dados_dashboard.js"></script>
 <script>
@@ -139,7 +139,7 @@
 <header class="topbar">
   <div class="logo">
     <div class="logo-mark">F</div>
-    <div class="logo-text">FIPE — Depreciação &amp; Spread <span>Novo vs Seminovo · Top 50</span></div>
+    <div class="logo-text" data-en="FIPE — Depreciation &amp; Spread <span>New vs Used · Top 50</span>">FIPE — Depreciação &amp; Spread <span>Novo vs Seminovo · Top 50</span></div>
   </div>
   <div class="sub2" id="sub"></div>
 </header>
@@ -150,30 +150,30 @@
 
   <!-- controles compartilhados (visiveis por aba via data-tabs) -->
   <div class="controls" id="ctlbar">
-    <div class="ctl" data-tabs="visao tend"><label>Corte</label>
+    <div class="ctl" data-tabs="visao tend"><label data-en="Breakdown">Corte</label>
       <select id="corte">
-        <option value="Consolidado">Consolidado</option>
-        <option value="Categoria">Por categoria</option>
-        <option value="Origem">Por origem (Chinês × Não-chinês)</option>
+        <option value="Consolidado" data-en="Consolidated">Consolidado</option>
+        <option value="Categoria" data-en="By category">Por categoria</option>
+        <option value="Origem" data-en="By origin (Chinese × Non-Chinese)">Por origem (Chinês × Não-chinês)</option>
       </select>
     </div>
-    <div class="ctl" data-tabs="visao"><label>Faixa do seminovo</label>
+    <div class="ctl" data-tabs="visao"><label data-en="Used-car band">Faixa do seminovo</label>
       <select id="faixa"></select>
     </div>
-    <div class="ctl" data-tabs="visao tend"><label>Curvas mostram</label>
+    <div class="ctl" data-tabs="visao tend"><label data-en="Curves show">Curvas mostram</label>
       <select id="metrica">
-        <option value="retencao">Retenção (% retido)</option>
-        <option value="spread">Spread (% perdido)</option>
+        <option value="retencao" data-en="Retention (% retained)">Retenção (% retido)</option>
+        <option value="spread" data-en="Spread (% lost)">Spread (% perdido)</option>
       </select>
     </div>
-    <div class="ctl" data-tabs="visao tend modelo frotas"><label>Período — de</label>
+    <div class="ctl" data-tabs="visao tend modelo frotas"><label data-en="Period — from">Período — de</label>
       <select id="mesDe"></select>
     </div>
-    <div class="ctl" data-tabs="visao tend modelo frotas"><label>até</label>
+    <div class="ctl" data-tabs="visao tend modelo frotas"><label data-en="to">até</label>
       <select id="mesAte"></select>
     </div>
     <div class="ctl" data-tabs="visao tend modelo frotas"><label>&nbsp;</label>
-      <button type="button" id="mesReset" style="padding:5px 10px;border:1px solid #ccc;border-radius:6px;background:#fafafa;cursor:pointer;font-size:.82rem">Tudo</button>
+      <button type="button" id="mesReset" data-en="All" style="padding:5px 10px;border:1px solid #ccc;border-radius:6px;background:#fafafa;cursor:pointer;font-size:.82rem">Tudo</button>
     </div>
   </div>
 
@@ -181,56 +181,56 @@
   <div class="sec" id="sec-frotas">
     <!-- ===== Variação de preço por safra (ano-modelo) ===== -->
     <div class="card full" style="margin-top:16px;border:2px solid #1f9d55">
-      <h2 style="color:#1f9d55">Variação de preço por safra — ano-modelo</h2>
-      <p>Cada linha é um <b>ano-modelo</b> da frota Localiza, seguido mês a mês ao longo do tempo (sempre o mesmo carro → <b>sem degrau de virada de ano</b>). Passe o mouse pra ver a <b>média móvel de 3 meses</b> da variação — mostra se a depreciação está acelerando ou aliviando na ponta.</p>
+      <h2 style="color:#1f9d55" data-en="Price variation by vintage — model year">Variação de preço por safra — ano-modelo</h2>
+      <p data-en="Each line is a <b>model year</b> of the Localiza fleet, tracked month by month over time (always the same car → <b>no year-turn step</b>). Hover to see the <b>3-month moving average</b> of the variation — it shows whether depreciation is accelerating or easing at the latest point.">Cada linha é um <b>ano-modelo</b> da frota Localiza, seguido mês a mês ao longo do tempo (sempre o mesmo carro → <b>sem degrau de virada de ano</b>). Passe o mouse pra ver a <b>média móvel de 3 meses</b> da variação — mostra se a depreciação está acelerando ou aliviando na ponta.</p>
       <div id="safrasSel" style="margin:8px 0 12px"></div>
       <div id="safrasChartWrap" class="chartbox" style="height:430px"><canvas id="cSafras"></canvas></div>
       <div id="safrasTabela" style="display:none;overflow-x:auto"></div>
       <p class="hint" id="safrasNota" style="margin-top:10px;line-height:1.5"></p>
     </div>
 
-    <p class="hint" style="margin:18px 0 0">Depreciação <b>restrita aos modelos que cada locadora mais roda</b> (frota típica). Fonte da frota: seminovos mais vendidos no site de cada uma.</p>
+    <p class="hint" style="margin:18px 0 0" data-en="Depreciation <b>restricted to the models each rental company runs most</b> (typical fleet). Fleet source: best-selling used cars on each company's website.">Depreciação <b>restrita aos modelos que cada locadora mais roda</b> (frota típica). Fonte da frota: seminovos mais vendidos no site de cada uma.</p>
     <div class="controls">
-      <div class="ctl"><label>Empresas</label>
+      <div class="ctl"><label data-en="Companies">Empresas</label>
         <select id="frEmpresa">
           <option value="ambas">Localiza × Movida</option>
-          <option value="Localiza">Só Localiza</option>
-          <option value="Movida">Só Movida</option>
+          <option value="Localiza" data-en="Localiza only">Só Localiza</option>
+          <option value="Movida" data-en="Movida only">Só Movida</option>
         </select>
       </div>
-      <div class="ctl"><label>Restrição</label>
+      <div class="ctl"><label data-en="Restriction">Restrição</label>
         <select id="frNivel">
-          <option value="nameplate">Modelo (nameplate)</option>
-          <option value="trim">Versão (trim) — aprox.</option>
+          <option value="nameplate" data-en="Model (nameplate)">Modelo (nameplate)</option>
+          <option value="trim" data-en="Version (trim) — approx.">Versão (trim) — aprox.</option>
         </select>
       </div>
-      <div class="ctl"><label>Ponderação</label>
+      <div class="ctl"><label data-en="Weighting">Ponderação</label>
         <select id="frPond">
-          <option value="igual">Igual por modelo</option>
-          <option value="volume">Por volume de frota</option>
+          <option value="igual" data-en="Equal by model">Igual por modelo</option>
+          <option value="volume" data-en="By fleet volume">Por volume de frota</option>
         </select>
       </div>
-      <div class="ctl"><label>Categoria</label>
+      <div class="ctl"><label data-en="Category">Categoria</label>
         <select id="frCat"></select>
       </div>
-      <div class="ctl"><label>Curvas mostram</label>
+      <div class="ctl"><label data-en="Curves show">Curvas mostram</label>
         <select id="frMetrica">
-          <option value="retencao">Retenção (% retido)</option>
-          <option value="spread">Spread (% perdido)</option>
+          <option value="retencao" data-en="Retention (% retained)">Retenção (% retido)</option>
+          <option value="spread" data-en="Spread (% lost)">Spread (% perdido)</option>
         </select>
       </div>
-      <div class="ctl"><label>Faixa (gap)</label>
+      <div class="ctl"><label data-en="Band (gap)">Faixa (gap)</label>
         <select id="frFaixa"></select>
       </div>
     </div>
     <p class="hint" id="frNote" style="margin:8px 0 0;color:#b06a00"></p>
     <div class="grid">
-      <div class="card"><h2>Curva de depreciação por idade</h2><p>% do valor de novo retido, por idade — frota de cada locadora.</p><div class="chartbox"><canvas id="cFrCurva"></canvas></div></div>
-      <div class="card"><h2>Gap Novo vs Seminovo no tempo</h2><p>Spread mês a mês, idade real constante. Subindo = depreciação aumentando.</p><div class="chartbox"><canvas id="cFrGap"></canvas></div></div>
-      <div class="card full"><h2>Índice de preço do seminovo (base 100)</h2><p>Preço de um seminovo de 2 anos (idade real fixa), indexado a 100 no 1º mês da série.</p><div class="chartbox"><canvas id="cFrIndice"></canvas></div></div>
+      <div class="card"><h2 data-en="Depreciation curve by age">Curva de depreciação por idade</h2><p data-en="% of new-car value retained, by age — each rental company's fleet.">% do valor de novo retido, por idade — frota de cada locadora.</p><div class="chartbox"><canvas id="cFrCurva"></canvas></div></div>
+      <div class="card"><h2 data-en="New vs Used gap over time">Gap Novo vs Seminovo no tempo</h2><p data-en="Spread month by month, constant real age. Rising = depreciation increasing.">Spread mês a mês, idade real constante. Subindo = depreciação aumentando.</p><div class="chartbox"><canvas id="cFrGap"></canvas></div></div>
+      <div class="card full"><h2 data-en="Used-car price index (base 100)">Índice de preço do seminovo (base 100)</h2><p data-en="Price of a 2-year-old used car (fixed real age), indexed to 100 in the series' first month.">Preço de um seminovo de 2 anos (idade real fixa), indexado a 100 no 1º mês da série.</p><div class="chartbox"><canvas id="cFrIndice"></canvas></div></div>
     </div>
     <div class="card full" style="margin-top:14px">
-      <h2>Cobertura da frota</h2>
+      <h2 data-en="Fleet coverage">Cobertura da frota</h2>
       <p id="frCobertura" class="hint" style="line-height:1.6"></p>
     </div>
   </div>
@@ -240,29 +240,29 @@
     <div class="kpis" id="kpis"></div>
     <div class="grid">
       <div class="card">
-        <h2>Curva de depreciação por idade</h2>
-        <p>% do valor de novo que o carro retém, por idade (mês mais recente). Apples-to-apples: mesmo modelo, mesmo mês.</p>
+        <h2 data-en="Depreciation curve by age">Curva de depreciação por idade</h2>
+        <p data-en="% of new-car value the car retains, by age (most recent month). Apples-to-apples: same model, same month.">% do valor de novo que o carro retém, por idade (mês mais recente). Apples-to-apples: mesmo modelo, mesmo mês.</p>
         <div class="chartbox"><canvas id="cDep"></canvas></div>
       </div>
       <div class="card">
-        <h2>Gap Novo vs Seminovo no tempo</h2>
-        <p>Quanto o seminovo está abaixo do 0 km, mês a mês. Idade real constante (sem o degrau de janeiro). Subindo = depreciação aumentando.</p>
+        <h2 data-en="New vs Used gap over time">Gap Novo vs Seminovo no tempo</h2>
+        <p data-en="How far the used car sits below the new one (0 km), month by month. Constant real age (no January step). Rising = depreciation increasing.">Quanto o seminovo está abaixo do 0 km, mês a mês. Idade real constante (sem o degrau de janeiro). Subindo = depreciação aumentando.</p>
         <div class="chartbox"><canvas id="cSpread"></canvas></div>
-        <p class="hint" id="spreadNote" style="display:none;margin-top:8px;color:#b06a00">ℹ️ A série mensal do <b>1 ano</b> tem um ruído de janeiro inerente (idade real 1 fica na borda dos dados). Para ler a tendência, prefira <b>"1 ano (suav.)"</b> no seletor de faixa, ou compare ano-contra-ano (jan→jan).</p>
+        <p class="hint" id="spreadNote" style="display:none;margin-top:8px;color:#b06a00" data-en='ℹ️ The monthly <b>1-year</b> series has inherent January noise (real age 1 sits at the edge of the data). To read the trend, prefer <b>"1 year (smoothed)"</b> in the band selector, or compare year-over-year (Jan→Jan).'>ℹ️ A série mensal do <b>1 ano</b> tem um ruído de janeiro inerente (idade real 1 fica na borda dos dados). Para ler a tendência, prefira <b>"1 ano (suav.)"</b> no seletor de faixa, ou compare ano-contra-ano (jan→jan).</p>
       </div>
     </div>
   </div>
 
   <!-- ABA: POR MODELO -->
   <div class="sec" id="sec-modelo">
-    <p class="hint" style="margin:18px 0 0">O "carro travado": trava a idade e acompanha o preço / gap do modelo ao longo do tempo. Escolha à esquerda; compare quantos quiser.</p>
+    <p class="hint" style="margin:18px 0 0" data-en='The "locked car": lock the age and track the model&#39;s price / gap over time. Pick on the left; compare as many as you like.'>O "carro travado": trava a idade e acompanha o preço / gap do modelo ao longo do tempo. Escolha à esquerda; compare quantos quiser.</p>
     <div class="mod-layout">
       <!-- painel de selecao -->
       <div class="mod-picker">
         <input id="modBusca" type="text" placeholder="🔍 Buscar modelo..." autocomplete="off" />
         <div class="mod-quick">
-          <button type="button" data-quick="campeoes">Campeões</button>
-          <button type="button" data-quick="limpar">Limpar</button>
+          <button type="button" data-quick="campeoes" data-en="Top sellers">Campeões</button>
+          <button type="button" data-quick="limpar" data-en="Clear">Limpar</button>
         </div>
         <div id="modLista" class="mod-lista"></div>
       </div>
@@ -270,29 +270,29 @@
       <div class="mod-content">
         <div id="modChips" class="mod-chips"></div>
         <div class="controls" style="margin-top:4px">
-          <div class="ctl"><label>Modo</label>
+          <div class="ctl"><label data-en="Mode">Modo</label>
             <select id="modModo">
-              <option value="evolucao">Evolução de 1 modelo (0 / 1 / 2 / 3 anos)</option>
-              <option value="comparar">Comparar modelos</option>
-              <option value="safra">Variação por safra (ano-modelo)</option>
+              <option value="evolucao" data-en="Evolution of 1 model (0 / 1 / 2 / 3 years)">Evolução de 1 modelo (0 / 1 / 2 / 3 anos)</option>
+              <option value="comparar" data-en="Compare models">Comparar modelos</option>
+              <option value="safra" data-en="Variation by vintage (model year)">Variação por safra (ano-modelo)</option>
             </select>
           </div>
-          <div class="ctl" id="ctlIdade"><label>Idade</label>
+          <div class="ctl" id="ctlIdade"><label data-en="Age">Idade</label>
             <select id="idadeMod">
-              <option value="0">0 km (novo)</option>
-              <option value="1" selected>1 ano</option>
-              <option value="2">2 anos</option>
-              <option value="3">3 anos</option>
+              <option value="0" data-en="0 km (new)">0 km (novo)</option>
+              <option value="1" selected data-en="1 year">1 ano</option>
+              <option value="2" data-en="2 years">2 anos</option>
+              <option value="3" data-en="3 years">3 anos</option>
             </select>
           </div>
-          <div class="ctl" id="ctlEixo"><label>Eixo</label>
+          <div class="ctl" id="ctlEixo"><label data-en="Axis">Eixo</label>
             <select id="eixoMod">
-              <option value="rs">R$ (valor)</option>
-              <option value="100">Base 100</option>
-              <option value="gap">Gap (% abaixo do 0 km)</option>
+              <option value="rs" data-en="R$ (value)">R$ (valor)</option>
+              <option value="100" data-en="Base 100">Base 100</option>
+              <option value="gap" data-en="Gap (% below 0 km)">Gap (% abaixo do 0 km)</option>
             </select>
           </div>
-          <label class="ck" id="ckTrims"><input type="checkbox" id="trimsMod" /> versões (trims)</label>
+          <label class="ck" id="ckTrims"><input type="checkbox" id="trimsMod" /> <span data-en="versions (trims)">versões (trims)</span></label>
         </div>
         <div id="modKpis" class="mod-kpis"></div>
         <div class="card full">
@@ -300,7 +300,7 @@
           <div class="chartbox" style="height:360px"><canvas id="cModelo"></canvas></div>
         </div>
         <div class="card full" style="margin-top:12px">
-          <h2 style="font-size:.92rem">Valores do último mês <span class="hint" style="font-weight:400">— para conferir na FIPE</span></h2>
+          <h2 style="font-size:.92rem" data-en='Last-month values <span class="hint" style="font-weight:400">— to check against FIPE</span>'>Valores do último mês <span class="hint" style="font-weight:400">— para conferir na FIPE</span></h2>
           <div id="modTabela" style="overflow-x:auto"></div>
         </div>
       </div>
@@ -311,14 +311,14 @@
   <div class="sec" id="sec-tend">
     <div class="grid">
       <div class="card full">
-        <h2>Curva de depreciação — evolução no tempo</h2>
-        <p>A mesma curva por idade, tirada hoje e há 1, 6 e 12 meses. Curva descendo = depreciação piorou em todas as idades.
-          <span class="seg-inline">Segmento: <select id="segCurva"></select></span></p>
+        <h2 data-en="Depreciation curve — evolution over time">Curva de depreciação — evolução no tempo</h2>
+        <p><span data-en="The same curve by age, taken today and 1, 6 and 12 months ago. Curve dropping = depreciation worsened at all ages.">A mesma curva por idade, tirada hoje e há 1, 6 e 12 meses. Curva descendo = depreciação piorou em todas as idades.</span>
+          <span class="seg-inline"><span data-en="Segment:">Segmento:</span> <select id="segCurva"></select></span></p>
         <div class="chartbox"><canvas id="cCurvaTempo"></canvas></div>
       </div>
       <div class="card full">
-        <h2>Índice de preço do seminovo (base 100)</h2>
-        <p>Preço de um seminovo de <b>2 anos</b> (idade real constante), indexado a 100 no 1º mês. Mostra o nível de preço do usado controlando pela idade.</p>
+        <h2 data-en="Used-car price index (base 100)">Índice de preço do seminovo (base 100)</h2>
+        <p data-en="Price of a <b>2-year-old</b> used car (constant real age), indexed to 100 in the first month. Shows the used-car price level controlling for age.">Preço de um seminovo de <b>2 anos</b> (idade real constante), indexado a 100 no 1º mês. Mostra o nível de preço do usado controlando pela idade.</p>
         <div class="chartbox"><canvas id="cIndice"></canvas></div>
       </div>
     </div>
@@ -327,23 +327,23 @@
   <!-- ABA: METODOLOGIA -->
   <div class="sec" id="sec-metodo">
     <div class="metodo">
-      <h3>O que este painel mede</h3>
-      <p>Como o preço do <b>seminovo</b> se comporta em relação ao <b>0 km</b> (novo), usando a Tabela FIPE dos 50 carros mais vendidos.</p>
-      <h3>Definições</h3>
+      <h3 data-en="What this dashboard measures">O que este painel mede</h3>
+      <p data-en="How the <b>used-car</b> price behaves relative to <b>0 km</b> (new), using the FIPE Table for the 50 best-selling cars.">Como o preço do <b>seminovo</b> se comporta em relação ao <b>0 km</b> (novo), usando a Tabela FIPE dos 50 carros mais vendidos.</p>
+      <h3 data-en="Definitions">Definições</h3>
       <ul>
-        <li><span class="k">Novo (0 km)</span> — preço do zero-km informado pela FIPE.</li>
-        <li><span class="k">Retenção</span> — preço do seminovo ÷ preço do 0 km no <b>mesmo mês e mesmo modelo</b> (apples-to-apples).</li>
-        <li><span class="k">Spread</span> — 1 − retenção. O "gap" de preço entre novo e seminovo.</li>
-        <li><span class="k">Idade real</span> — idade + fração do ano já decorrida (jan = +0; jul = +0,5; dez = +0,92).</li>
+        <li data-en='<span class="k">New (0 km)</span> — the zero-km price reported by FIPE.'><span class="k">Novo (0 km)</span> — preço do zero-km informado pela FIPE.</li>
+        <li data-en='<span class="k">Retention</span> — used-car price ÷ 0 km price in the <b>same month and same model</b> (apples-to-apples).'><span class="k">Retenção</span> — preço do seminovo ÷ preço do 0 km no <b>mesmo mês e mesmo modelo</b> (apples-to-apples).</li>
+        <li data-en='<span class="k">Spread</span> — 1 − retention. The price "gap" between new and used.'><span class="k">Spread</span> — 1 − retenção. O "gap" de preço entre novo e seminovo.</li>
+        <li data-en='<span class="k">Real age</span> — age + fraction of the year already elapsed (Jan = +0; Jul = +0.5; Dec = +0.92).'><span class="k">Idade real</span> — idade + fração do ano já decorrida (jan = +0; jul = +0,5; dez = +0,92).</li>
       </ul>
-      <h3>Por que "idade real constante"</h3>
-      <p>A FIPE re-envelhece a frota inteira no dia 1º de janeiro (idade = ano − ano-modelo, um número inteiro). Isso criava um "dente de serra" nas séries. Medindo o gap sempre numa <b>idade real fixa</b> (interpolando entre anos-modelo), a troca de cesta de janeiro desaparece e sobra só o sinal real.</p>
-      <h3>Consolidação</h3>
-      <p>Peso <b>igual por modelo</b>: mediana entre as versões de cada modelo, depois <b>média</b> entre modelos (mais estável quando há poucos modelos, como nos chineses). Cortes: Consolidado · Categoria (Entrada/Hatch/Compact Sedan/SUV/<b>Chinês</b>/Outros) · Origem (Chinês/Não-chinês). Os modelos chineses ficam na categoria própria "Chinês", sem misturar com os segmentos nacionais.</p>
-      <h3>Retenção vs. "novo equivalente"</h3>
-      <p>A retenção usa o 0 km do <b>mesmo trim</b> quando existe. Quando o trim saiu de linha (a FIPE troca o código a cada geração), usamos o 0 km <b>mediano do nameplate</b> no mês como referência — assim a depreciação de gerações antigas é medida contra o novo equivalente atual, em vez de jogar fora ~metade dos seminovos.</p>
-      <h3>Série mensal do "1 ano"</h3>
-      <p>O gap de <b>1 ano</b> tem um ruído de janeiro inerente: a "idade real 1" fica na borda dos dados (o único dado mais novo é o usado do ano corrente, que é volátil). Por isso oferecemos a opção <b>"1 ano (suav.)"</b> (média móvel de 12 meses, sem sazonalidade). O <b>2 anos</b>, <b>3 anos</b> e a curva de depreciação por idade não têm esse ruído.</p>
+      <h3 data-en='Why "constant real age"'>Por que "idade real constante"</h3>
+      <p data-en='FIPE re-ages the entire fleet on January 1st (age = year − model year, a whole number). This created a "sawtooth" in the series. By always measuring the gap at a <b>fixed real age</b> (interpolating between model years), the January basket switch disappears and only the real signal remains.'>A FIPE re-envelhece a frota inteira no dia 1º de janeiro (idade = ano − ano-modelo, um número inteiro). Isso criava um "dente de serra" nas séries. Medindo o gap sempre numa <b>idade real fixa</b> (interpolando entre anos-modelo), a troca de cesta de janeiro desaparece e sobra só o sinal real.</p>
+      <h3 data-en="Consolidation">Consolidação</h3>
+      <p data-en='<b>Equal-by-model</b> weight: median across each model&#39;s versions, then the <b>average</b> across models (more stable when there are few models, as with the Chinese ones). Breakdowns: Consolidated · Category (Entry/Hatch/Compact Sedan/SUV/<b>Chinese</b>/Others) · Origin (Chinese/Non-Chinese). Chinese models sit in their own "Chinese" category, without mixing with the domestic segments.'>Peso <b>igual por modelo</b>: mediana entre as versões de cada modelo, depois <b>média</b> entre modelos (mais estável quando há poucos modelos, como nos chineses). Cortes: Consolidado · Categoria (Entrada/Hatch/Compact Sedan/SUV/<b>Chinês</b>/Outros) · Origem (Chinês/Não-chinês). Os modelos chineses ficam na categoria própria "Chinês", sem misturar com os segmentos nacionais.</p>
+      <h3 data-en='Retention vs. "equivalent new"'>Retenção vs. "novo equivalente"</h3>
+      <p data-en="Retention uses the <b>same trim's</b> 0 km when it exists. When the trim is discontinued (FIPE changes the code each generation), we use the <b>nameplate's median</b> 0 km for the month as reference — this way the depreciation of older generations is measured against the current equivalent new car, instead of discarding ~half of the used cars.">A retenção usa o 0 km do <b>mesmo trim</b> quando existe. Quando o trim saiu de linha (a FIPE troca o código a cada geração), usamos o 0 km <b>mediano do nameplate</b> no mês como referência — assim a depreciação de gerações antigas é medida contra o novo equivalente atual, em vez de jogar fora ~metade dos seminovos.</p>
+      <h3 data-en='The monthly "1-year" series'>Série mensal do "1 ano"</h3>
+      <p data-en='The <b>1-year</b> gap has inherent January noise: "real age 1" sits at the edge of the data (the only newer data point is the current-year used car, which is volatile). That&#39;s why we offer the <b>"1 year (smoothed)"</b> option (12-month moving average, no seasonality). The <b>2 years</b>, <b>3 years</b> and the depreciation-curve-by-age don&#39;t have this noise.'>O gap de <b>1 ano</b> tem um ruído de janeiro inerente: a "idade real 1" fica na borda dos dados (o único dado mais novo é o usado do ano corrente, que é volátil). Por isso oferecemos a opção <b>"1 ano (suav.)"</b> (média móvel de 12 meses, sem sazonalidade). O <b>2 anos</b>, <b>3 anos</b> e a curva de depreciação por idade não têm esse ruído.</p>
       <p class="hint" id="metodoFonte"></p>
     </div>
   </div>
@@ -353,6 +353,29 @@
 </div>
 
 <script>
+// ===== i18n: o hub controla o idioma via ?lang; PT é o padrão =====
+var LANG = 'pt';
+try { var _ul = new URLSearchParams(location.search).get('lang'); if (_ul === 'en' || _ul === 'pt') LANG = _ul; } catch(e){}
+function t(pt, en){ return LANG === 'en' ? en : pt; }
+document.documentElement.lang = LANG === 'en' ? 'en' : 'pt-BR';
+// meses PT -> EN (só para EXIBIÇÃO; as comparações no código seguem em PT)
+var MES_ABBR_EN = { jan:'Jan', fev:'Feb', mar:'Mar', abr:'Apr', mai:'May', jun:'Jun', jul:'Jul', ago:'Aug', set:'Sep', out:'Oct', nov:'Nov', dez:'Dec' };
+var MES_FULL_EN = { janeiro:'January', fevereiro:'February', 'março':'March', marco:'March', abril:'April', maio:'May', junho:'June', julho:'July', agosto:'August', setembro:'September', outubro:'October', novembro:'November', dezembro:'December' };
+function mesLbl(s){
+  if (LANG !== 'en' || s == null) return s;
+  return String(s)
+    .replace(/janeiro|fevereiro|mar[çc]o|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro/gi, function(m){ return MES_FULL_EN[m.toLowerCase()] || m; })
+    .replace(/\b(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)\b/gi, function(m){ return MES_ABBR_EN[m.toLowerCase()] || m; });
+}
+// rótulo de idade em anos ("2 anos" / "2 years")
+function anosLbl(i){ return LANG === 'en' ? (i + ' year' + (i === 1 ? '' : 's')) : (i + ' ano' + (i === 1 ? '' : 's')); }
+// categorias/segmentos vindos do arquivo de dados (traduz só para exibir; conjunto conhecido)
+var CAT_EN = { 'Entrada':'Entry', 'Hatch':'Hatch', 'Compact Sedan':'Compact Sedan', 'Sedan':'Sedan', 'SUV':'SUV', 'Chinês':'Chinese', 'Chinese':'Chinese', 'Outros':'Others', 'Todos':'All', 'Todas':'All', 'Não-chinês':'Non-Chinese', 'Consolidado':'Consolidated', 'Econômicos':'Economy' };
+function catLbl(c){ return LANG === 'en' ? (CAT_EN[c] || c) : c; }
+// faixas do seminovo vindas dos dados (traduz só para exibir; valor/comparação segue em PT)
+var FAIXA_EN = { 'Seminovo 1-3':'Used 1-3', '1 ano':'1 year', '1 ano (suav.)':'1 year (smoothed)', '1 ano (suav)':'1 year (smoothed)', '2 anos':'2 years', '3 anos':'3 years' };
+function faixaLbl(f){ return LANG === 'en' ? (FAIXA_EN[f] || f) : f; }
+
 const D = window.FIPE_DADOS;
 const PCT = (x) => (x * 100).toFixed(1).replace(".", ",") + "%";
 const ORDEM_CAT = ["Entrada", "Hatch", "Compact Sedan", "SUV", "Chinês", "Outros"];
@@ -365,29 +388,29 @@ const LABELS_MES = MESES.map((m) => m.mes);
 const TAB_IDX = Object.fromEntries(MESES.map((m, i) => [m.codigo_tabela, i]));
 
 // ---- janela temporal (De/Até) aplicada às séries no tempo ----
-const labMesCurto = MESES.map((m) => { const [n, a] = m.mes.trim().split("/"); return n.slice(0, 3) + "/" + a.slice(2); });
+const labMesCurto = MESES.map((m) => { const [n, a] = m.mes.trim().split("/"); return mesLbl(n.slice(0, 3) + "/" + a.slice(2)); });
 (function () {
   const de = document.getElementById("mesDe"), ate = document.getElementById("mesAte");
   labMesCurto.forEach((m, i) => { de.appendChild(new Option(m, i)); ate.appendChild(new Option(m, i)); });
   de.value = 0; ate.value = MESES.length - 1;
 })();
 function winRange() { let a = +document.getElementById("mesDe").value, b = +document.getElementById("mesAte").value; if (a > b) { const t = a; a = b; b = t; } return [a, b]; }
-function winLabels() { const [a, b] = winRange(); return LABELS_MES.slice(a, b + 1); }
+function winLabels() { const [a, b] = winRange(); return LABELS_MES.slice(a, b + 1).map(mesLbl); }
 function winSlice(arr) { const [a, b] = winRange(); return arr.slice(a, b + 1); }
 const W = (datasets) => datasets.map((d) => ({ ...d, data: winSlice(d.data) })); // janela (corta) p/ spread, gap, R$
 // para índices: corta E re-baseia a 100 no 1º mês visível da janela
 const Widx = (datasets) => datasets.map((d) => { const sl = winSlice(d.data); const base = sl.find((v) => v != null); return { ...d, data: base ? sl.map((v) => (v == null ? null : +(100 * v / base).toFixed(1))) : sl }; });
 
 document.getElementById("sub").textContent =
-  `${D.meta.periodo.de} a ${D.meta.periodo.ate} · ${MESES.length} meses`;
+  `${mesLbl(D.meta.periodo.de)} ${t("a", "to")} ${mesLbl(D.meta.periodo.ate)} · ${MESES.length} ${t("meses", "months")}`;
 document.getElementById("foot").textContent =
-  `Fonte: Tabela FIPE (Top 50 mais vendidos). Gerado em ${D.meta.gerado_em}.`;
+  `${t("Fonte: Tabela FIPE (Top 50 mais vendidos). Gerado em", "Source: FIPE Table (Top 50 best-sellers). Generated on")} ${mesLbl(D.meta.gerado_em)}.`;
 document.getElementById("metodoFonte").textContent =
-  `Período: ${D.meta.periodo.de} a ${D.meta.periodo.ate} · ${MESES.length} meses · gerado em ${D.meta.gerado_em}.`;
+  `${t("Período", "Period")}: ${mesLbl(D.meta.periodo.de)} ${t("a", "to")} ${mesLbl(D.meta.periodo.ate)} · ${MESES.length} ${t("meses", "months")} · ${t("gerado em", "generated on")} ${mesLbl(D.meta.gerado_em)}.`;
 
 const selFaixa = document.getElementById("faixa");
 D.meta.faixas.forEach((f) => {
-  const o = document.createElement("option"); o.value = f; o.textContent = f;
+  const o = document.createElement("option"); o.value = f; o.textContent = faixaLbl(f);
   if (f === "Seminovo 1-3") o.selected = true;
   selFaixa.appendChild(o);
 });
@@ -397,12 +420,12 @@ const frCatSel = document.getElementById("frCat");
 const catsFrota = ["Todos", ...ORDEM_CAT.filter((c) => D.frotas.curva.some((x) => x.segmento === c))];
 catsFrota.forEach((c) => {
   const o = document.createElement("option"); o.value = c;
-  o.textContent = c === "Todos" ? "Todas" : (c === "Compact Sedan" ? "Sedan" : c);
+  o.textContent = c === "Todos" ? t("Todas", "All") : (c === "Compact Sedan" ? "Sedan" : catLbl(c));
   frCatSel.appendChild(o);
 });
 const frFaixaSel = document.getElementById("frFaixa");
 D.meta.faixas.forEach((f) => {
-  const o = document.createElement("option"); o.value = f; o.textContent = f;
+  const o = document.createElement("option"); o.value = f; o.textContent = faixaLbl(f);
   if (f === "Seminovo 1-3") o.selected = true;
   frFaixaSel.appendChild(o);
 });
@@ -416,7 +439,7 @@ function serieSpread(corte, seg, faixa) {
 function kpis() {
   const k = document.getElementById("kpis");
   const seta = (d) => d == null ? "" :
-    (d > 0.0005 ? "▲ +" : d < -0.0005 ? "▼ " : "● ") + (d * 100).toFixed(1).replace(".", ",") + " p.p. vs 12m";
+    (d > 0.0005 ? "▲ +" : d < -0.0005 ? "▼ " : "● ") + (d * 100).toFixed(1).replace(".", ",") + t(" p.p. vs 12m", " pp vs 12m");
   const corDelta = (d) => d == null ? "var(--muted)" : d > 0.0005 ? "var(--red)" : d < -0.0005 ? "var(--green)" : "var(--muted)";
   const sCons = serieSpread("Consolidado", "Todos", "Seminovo 1-3");
   const ult = sCons[sCons.length - 1];
@@ -427,12 +450,12 @@ function kpis() {
   const sChi = serieSpread("Origem", "Chinês", "Seminovo 1-3").at(-1);
   const sNao = serieSpread("Origem", "Não-chinês", "Seminovo 1-3").at(-1);
   const dChi = sChi && sNao ? sChi.spread_mediana - sNao.spread_mediana : null;
-  const txtChi = dChi == null ? "" : `${dChi > 0 ? "+" : ""}${(dChi * 100).toFixed(1).replace(".", ",")} p.p. vs resto`;
+  const txtChi = dChi == null ? "" : `${dChi > 0 ? "+" : ""}${(dChi * 100).toFixed(1).replace(".", ",")}${t(" p.p. vs resto", " pp vs rest")}`;
   const cards = [
-    { v: PCT(s1.spread_mediana), l: "Depreciação no 1º ano (gap vs 0 km)" },
-    { v: PCT(ult.spread_mediana), l: `Gap novo vs seminovo 1–3 · ${ult.mes_referencia}`, d: seta(d12), dc: corDelta(d12) },
-    { v: PCT(s3.spread_mediana), l: "Gap em 3 anos" },
-    { v: sChi ? PCT(sChi.spread_mediana) : "—", l: "Chineses · seminovo 1–3", d: txtChi, dc: corDelta(dChi) },
+    { v: PCT(s1.spread_mediana), l: t("Depreciação no 1º ano (gap vs 0 km)", "Depreciation in year 1 (gap vs 0 km)") },
+    { v: PCT(ult.spread_mediana), l: `${t("Gap novo vs seminovo 1–3", "New vs used 1–3 gap")} · ${mesLbl(ult.mes_referencia)}`, d: seta(d12), dc: corDelta(d12) },
+    { v: PCT(s3.spread_mediana), l: t("Gap em 3 anos", "3-year gap") },
+    { v: sChi ? PCT(sChi.spread_mediana) : "—", l: t("Chineses · seminovo 1–3", "Chinese · used 1–3"), d: txtChi, dc: corDelta(dChi) },
   ];
   k.innerHTML = cards.map((c) =>
     `<div class="kpi"><div class="v">${c.v}</div><div class="l">${c.l}</div>` +
@@ -487,8 +510,8 @@ function renderVisao() {
     });
     return baseLine(seg, pts, i);
   });
-  mkChart("cDep", "line", dsDep, idades.map((i) => i + " ano" + (i === 1 ? "" : "s")), fpct,
-    ehSpread ? "% perdido vs 0 km" : "% retido do valor de novo");
+  mkChart("cDep", "line", dsDep, idades.map(anosLbl), fpct,
+    ehSpread ? t("% perdido vs 0 km", "% lost vs 0 km") : t("% retido do valor de novo", "% of new-car value retained"));
 
   const dsSpread = segs.map((seg, i) => {
     const pts = new Array(MESES.length).fill(null);
@@ -496,7 +519,7 @@ function renderVisao() {
       .forEach((x) => { pts[TAB_IDX[x.codigo_tabela]] = +(x.spread_mediana * 100).toFixed(1); });
     return baseLine(seg, pts, i);
   });
-  mkChart("cSpread", "line", W(dsSpread), winLabels(), fpct, "spread (% abaixo do 0 km)");
+  mkChart("cSpread", "line", W(dsSpread), winLabels(), fpct, t("spread (% abaixo do 0 km)", "spread (% below 0 km)"));
   document.getElementById("spreadNote").style.display = (faixa === "1 ano") ? "block" : "none";
 }
 
@@ -511,7 +534,7 @@ const LOC_ACUM_INI = "janeiro/2023";
 // medias de gap por fase reportadas pela Localiza: [pre, pandemia, pos]
 const LOC_FASES = { 1: [19.7, 18.1, 23.8], 2: [25.1, 23.9, 29.5], 3: [30.3, 28.2, 33.1] };
 const LOC_DELTA = { 1: 4.1, 2: 4.4, 3: 2.8 };
-const LBL_IDADE = { 1: "1 ano", 2: "2 anos", 3: "3 anos" };
+const LBL_IDADE = { 1: t("1 ano", "1 year"), 2: t("2 anos", "2 years"), 3: t("3 anos", "3 years") };
 const FASES = [[2019, 2020], [2021, 2022], [2023, 2024]];
 const mesDeTab = (t) => MESES.find((m) => m.codigo_tabela === t)?.mes.trim();
 const anoDeTab = (t) => +mesDeTab(t).split("/")[1];
@@ -578,22 +601,22 @@ function renderKillerSel() {
   const bsOn = "padding:3px 11px;font-size:12px;border:1px solid #1f9d55;background:#1f9d55;color:#fff;border-radius:6px;cursor:pointer;font-weight:600";
   const bsOff = "padding:3px 11px;font-size:12px;border:1px solid #bbb;background:#fff;color:#666;border-radius:6px;cursor:pointer";
   // seletor de METODOLOGIA
-  const MET = [["var", "Carteira (casa por ano-modelo)"], ["fixo", "Réplica fiel (trava o trim básico)"]];
+  const MET = [["var", t("Carteira (casa por ano-modelo)", "Portfolio (matches by model year)")], ["fixo", t("Réplica fiel (trava o trim básico)", "Faithful replica (locks the base trim)")]];
   let h = '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px">';
-  h += '<span class="hint" style="margin-right:2px">Leitura:</span>';
+  h += `<span class="hint" style="margin-right:2px">${t("Leitura:", "Reading:")}</span>`;
   for (const [k, lab] of MET) h += `<button data-met="${k}" style="${killerMet === k ? bsOn : bsOff}">${lab}</button>`;
   h += '</div>';
   // presets de CESTA
-  const PRE = [["frota", "Frota completa (mix RENT)"], ["ampla", "Econômicos"], ["bc", "Frota locação B/C"], ["piores", "Espelho Localiza"]];
+  const PRE = [["frota", t("Frota completa (mix RENT)", "Full fleet (RENT mix)")], ["ampla", t("Econômicos", "Economy")], ["bc", t("Frota locação B/C", "B/C rental fleet")], ["piores", t("Espelho Localiza", "Localiza mirror")]];
   h += '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px">';
-  h += '<span class="hint" style="margin-right:2px">Cesta (clique para montar):</span>';
+  h += `<span class="hint" style="margin-right:2px">${t("Cesta (clique para montar):", "Basket (click to build):")}</span>`;
   for (const [k, lab] of PRE) h += `<button data-preset="${k}" style="${bs}">${lab}</button>`;
   h += '</div><div style="display:flex;flex-wrap:wrap;gap:5px 14px">';
   const mods = KM().modelos.filter((m) => killerTemDado(m.np)).sort((a, b) => (b.eco - a.eco) || ((killerIndivDrop(a.np) ?? 99) - (killerIndivDrop(b.np) ?? 99)));
   for (const m of mods) {
     const d = killerIndivDrop(m.np), dStr = d == null ? "—" : (d >= 0 ? "+" : "") + d.toFixed(1).replace(".", ",") + "pp";
     const dCol = d == null ? "#aaa" : (d <= -4 ? "#c0392b" : "#888");
-    const tt = m.trim ? ` title="trim travado: ${m.trim}"` : "";
+    const tt = m.trim ? ` title="${t("trim travado", "locked trim")}: ${m.trim}"` : "";
     h += `<label${tt} style="display:inline-flex;align-items:center;gap:5px;font-size:12.5px;cursor:pointer${m.eco ? "" : ";opacity:.72"}">` +
       `<input type="checkbox" data-np="${m.np}" ${killerSel.has(m.np) ? "checked" : ""}>` +
       `<span>${m.np} <span style="color:${dCol}">${dStr}</span></span></label>`;
@@ -622,7 +645,7 @@ function renderKiller() {
   const iBase = comp.findIndex((p) => p.mes === LOC_ACUM_INI);
   const win = iBase >= 0 ? comp.slice(iBase) : comp;
   const base = win[0] ? win[0].gap : 0;
-  const labB = win.map((p) => { const [n, a] = p.mes.split("/"); return n.slice(0, 3) + "/" + a.slice(2); });
+  const labB = win.map((p) => { const [n, a] = p.mes.split("/"); return mesLbl(n.slice(0, 3) + "/" + a.slice(2)); });
   const ours = win.map((p) => +(-(p.gap - base)).toFixed(1)); // negativo = perdeu valor vs 0km
   const ns = win.map((p) => p.n); // cobertura (modelos com o trim travado vivo no mês)
   const loc = win.map((_, i) => i < LOC_ACUM.length ? LOC_ACUM[i] : null);
@@ -649,13 +672,13 @@ function renderKiller() {
       if (iMP >= 0) {
         const xm = sx.getPixelForValue(iMP);
         ctx.strokeStyle = "#FF6200"; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(xm, chartArea.top); ctx.lineTo(xm, chartArea.bottom); ctx.stroke(); ctx.setLineDash([]);
-        ctx.fillStyle = "#FF6200"; ctx.font = "italic 8.5px Helvetica"; ctx.textAlign = "left"; ctx.fillText("Medida Provisória", xm + 3, chartArea.bottom - 4);
+        ctx.fillStyle = "#FF6200"; ctx.font = "italic 8.5px Helvetica"; ctx.textAlign = "left"; ctx.fillText(t("Medida Provisória", "Interim Measure"), xm + 3, chartArea.bottom - 4);
       }
       // marcador do IPI Verde (ago/23) — só na cesta variável; corte de IPI dos 1.0 fechou o gap
       if (iIPI >= 0) {
         const xi = sx.getPixelForValue(iIPI);
         ctx.strokeStyle = "#185FA5"; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(xi, chartArea.top + 14); ctx.lineTo(xi, chartArea.bottom); ctx.stroke(); ctx.setLineDash([]);
-        ctx.fillStyle = "#185FA5"; ctx.font = "italic 8.5px Helvetica"; ctx.textAlign = "right"; ctx.fillText("IPI Verde (carro 1.0)", xi - 3, chartArea.top + 20);
+        ctx.fillStyle = "#185FA5"; ctx.font = "italic 8.5px Helvetica"; ctx.textAlign = "right"; ctx.fillText(t("IPI Verde (carro 1.0)", "Green IPI (1.0 car)"), xi - 3, chartArea.top + 20);
       }
       // linhas delimitando os períodos usados no cálculo da taxa mensal
       PER.forEach((p, k) => {
@@ -674,7 +697,7 @@ function renderKiller() {
       const li = ours.length - 1, px = sx.getPixelForValue(li), py = sy.getPixelForValue(ours[li]);
       ctx.fillStyle = "#1f9d55"; ctx.beginPath(); ctx.arc(px, py, 4.5, 0, 2 * Math.PI); ctx.fill();
       ctx.textAlign = "right"; ctx.font = "bold 12px Helvetica"; ctx.fillStyle = "#1f9d55";
-      ctx.fillText(`${ours[li] >= 0 ? "+" : ""}${ours[li].toFixed(1).replace(".", ",")}% hoje`, px - 7, py - 8);
+      ctx.fillText(`${ours[li] >= 0 ? "+" : ""}${ours[li].toFixed(1).replace(".", ",")}%${t(" hoje", " today")}`, px - 7, py - 8);
       ctx.restore();
     },
   };
@@ -682,8 +705,8 @@ function renderKiller() {
   charts.cKillerAcum = new Chart(document.getElementById("cKillerAcum"), {
     type: "line",
     data: { labels: labB, datasets: [
-      { label: "Carro básico Localiza (nossa FIPE)", data: ours, borderColor: "#1f9d55", backgroundColor: "#1f9d55", borderWidth: 2.8, pointRadius: 0, tension: .25, spanGaps: true },
-      { label: "Localiza reportado (2T24)", data: loc, borderColor: "#888", backgroundColor: "#888", borderWidth: 2.4, borderDash: [6, 4], pointRadius: 0, tension: .25, spanGaps: true },
+      { label: t("Carro básico Localiza (nossa FIPE)", "Localiza base car (our FIPE)"), data: ours, borderColor: "#1f9d55", backgroundColor: "#1f9d55", borderWidth: 2.8, pointRadius: 0, tension: .25, spanGaps: true },
+      { label: t("Localiza reportado (2T24)", "Localiza reported (Q2 24)"), data: loc, borderColor: "#888", backgroundColor: "#888", borderWidth: 2.4, borderDash: [6, 4], pointRadius: 0, tension: .25, spanGaps: true },
     ] },
     options: {
       responsive: true, maintainAspectRatio: false, layout: { padding: { top: 22 } },
@@ -698,20 +721,21 @@ function renderKiller() {
             const i = it.dataIndex, d = it.dataset.data;
             if (i < 1 || d[i] == null || d[i - 1] == null) return "";
             const mom = d[i] - d[i - 1];
-            return `Depreciação no mês: ${mom <= 0 ? "▼ " : "▲ "}${Math.abs(mom).toFixed(1).replace(".", ",")} p.p.`;
+            return `${t("Depreciação no mês", "Depreciation in the month")}: ${mom <= 0 ? "▼ " : "▲ "}${Math.abs(mom).toFixed(1).replace(".", ",")}${t(" p.p.", " pp")}`;
           },
         } },
       },
       scales: {
         x: { ticks: { color: CG.tick, maxRotation: 60, autoSkip: true, maxTicksLimit: 14 }, grid: { color: CG.grid } },
-        y: { title: { display: true, text: "% vs jan/2023 (0 = base)", color: CG.tick }, ticks: { color: CG.tick, callback: (v) => v + "%" }, grid: { color: CG.grid } },
+        y: { title: { display: true, text: t("% vs jan/2023 (0 = base)", "% vs Jan/2023 (0 = base)"), color: CG.tick }, ticks: { color: CG.tick, callback: (v) => v + "%" }, grid: { color: CG.grid } },
       },
     },
     plugins: [killerPlugin],
   });
 
-  document.getElementById("killerNota").innerHTML =
-    `<b>Metodologia:</b> deterioração do valor residual (gap = 1 − preço seminovo / preço 0&nbsp;km, no mesmo mês — sem inflação) da <b>carteira de seminovos de 1 a 3 anos</b> da frota Localiza. A variação mensal é medida <b>casando o mesmo ano-modelo</b> entre meses consecutivos (acompanha o mesmo carro envelhecendo, ex.: ano-modelo 2025 em jun vs mai), o que <b>elimina a quebra da virada de ano</b> da FIPE. Índice <b>encadeado</b> desde jan/2023, ponderado pelo volume da frota. A linha cinza é o que a Localiza reportou no release 2T24; a marca em ago/2025 é o corte de IPI Verde (carros 1.0).`;
+  document.getElementById("killerNota").innerHTML = t(
+    `<b>Metodologia:</b> deterioração do valor residual (gap = 1 − preço seminovo / preço 0&nbsp;km, no mesmo mês — sem inflação) da <b>carteira de seminovos de 1 a 3 anos</b> da frota Localiza. A variação mensal é medida <b>casando o mesmo ano-modelo</b> entre meses consecutivos (acompanha o mesmo carro envelhecendo, ex.: ano-modelo 2025 em jun vs mai), o que <b>elimina a quebra da virada de ano</b> da FIPE. Índice <b>encadeado</b> desde jan/2023, ponderado pelo volume da frota. A linha cinza é o que a Localiza reportou no release 2T24; a marca em ago/2025 é o corte de IPI Verde (carros 1.0).`,
+    `<b>Methodology:</b> deterioration of residual value (gap = 1 − used price / 0&nbsp;km price, in the same month — no inflation) of the Localiza fleet's <b>1-to-3-year-old used-car portfolio</b>. The monthly variation is measured by <b>matching the same model year</b> across consecutive months (following the same car as it ages, e.g. model year 2025 in Jun vs May), which <b>eliminates FIPE's year-turn break</b>. <b>Chained</b> index since Jan/2023, weighted by fleet volume. The gray line is what Localiza reported in its Q2 24 release; the mark in Aug/2025 is the Green IPI tax cut (1.0 cars).`);
 }
 // ===== GRÁFICO DE SAFRAS (linha = ano-modelo, eixo = tempo) =====
 const S = D.frotas.safras;
@@ -723,7 +747,7 @@ let safraModo = "acum"; // "acum" = acumulado | "var" = variação suavizada (m�
 let safraVis = "grafico"; // "grafico" | "tabela"
 let safraMeses = S.tabs.length; // período mostrado (nº de meses)
 let safraIni = 0; // índice global do 1º mês visível (p/ o tooltip)
-const mesLabSafra = (tab) => { const m = ((MESES.find((x) => x.codigo_tabela === tab) || {}).mes || "").trim(); const [n, a] = m.split("/"); return n ? n.slice(0, 3) + "/" + a.slice(2) : ""; };
+const mesLabSafra = (tab) => { const m = ((MESES.find((x) => x.codigo_tabela === tab) || {}).mes || "").trim(); const [n, a] = m.split("/"); return n ? mesLbl(n.slice(0, 3) + "/" + a.slice(2)) : ""; };
 const varCru = (cat, am, tab) => { const v = (S.varSafra[cat] && S.varSafra[cat][am]) ? S.varSafra[cat][am][tab] : null; return v == null ? null : +(v * 100).toFixed(2); };
 function serieSafra(cat, am) {
   // Variação: linha = média móvel 3m (suave). Acumulado: soma encadeada.
@@ -752,18 +776,18 @@ function renderSafrasSel() {
   const cont = document.getElementById("safrasSel"); if (!cont) return;
   const bOn = "padding:3px 11px;font-size:12px;border:1px solid #1f9d55;background:#1f9d55;color:#fff;border-radius:6px;cursor:pointer;font-weight:600";
   const bOff = "padding:3px 11px;font-size:12px;border:1px solid #bbb;background:#fff;color:#666;border-radius:6px;cursor:pointer";
-  let h = '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px"><span class="hint" style="margin-right:2px">Ver:</span>';
-  h += `<button data-vis="grafico" style="${safraVis === "grafico" ? bOn : bOff}">Gráfico</button>`;
-  h += `<button data-vis="tabela" style="${safraVis === "tabela" ? bOn : bOff}">Tabela resumo</button>`;
-  h += '<span class="hint" style="margin:0 4px 0 10px">Visão:</span>';
-  h += `<button data-modo="acum" style="${safraModo === "acum" ? bOn : bOff}">Acumulado</button>`;
-  h += `<button data-modo="var" style="${safraModo === "var" ? bOn : bOff}">Variação (suave 3m)</button>`;
-  h += '</div><div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px"><span class="hint" style="margin-right:2px">Categoria:</span>';
-  for (const g of S.grupos) h += `<button data-cat="${g}" style="${safraCat === g ? bOn : bOff}">${g}</button>`;
-  h += '</div><div style="display:flex;flex-wrap:wrap;gap:5px 14px;align-items:center"><span class="hint" style="margin-right:2px">Safras (ano-modelo):</span>';
+  let h = `<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px"><span class="hint" style="margin-right:2px">${t("Ver:", "View:")}</span>`;
+  h += `<button data-vis="grafico" style="${safraVis === "grafico" ? bOn : bOff}">${t("Gráfico", "Chart")}</button>`;
+  h += `<button data-vis="tabela" style="${safraVis === "tabela" ? bOn : bOff}">${t("Tabela resumo", "Summary table")}</button>`;
+  h += `<span class="hint" style="margin:0 4px 0 10px">${t("Visão:", "View:")}</span>`;
+  h += `<button data-modo="acum" style="${safraModo === "acum" ? bOn : bOff}">${t("Acumulado", "Cumulative")}</button>`;
+  h += `<button data-modo="var" style="${safraModo === "var" ? bOn : bOff}">${t("Variação (suave 3m)", "Variation (3m smooth)")}</button>`;
+  h += `</div><div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px"><span class="hint" style="margin-right:2px">${t("Categoria:", "Category:")}</span>`;
+  for (const g of S.grupos) h += `<button data-cat="${g}" style="${safraCat === g ? bOn : bOff}">${catLbl(g)}</button>`;
+  h += `</div><div style="display:flex;flex-wrap:wrap;gap:5px 14px;align-items:center"><span class="hint" style="margin-right:2px">${t("Safras (ano-modelo):", "Vintages (model year):")}</span>`;
   for (const am of S.anos) { const c = SAFRA_CORES[am] || "#888"; h += `<label style="display:inline-flex;align-items:center;gap:4px;font-size:12.5px;cursor:pointer"><input type="checkbox" data-am="${am}" ${safrasSel.has(am) ? "checked" : ""}><span style="color:${c};font-weight:500">${am}</span></label>`; }
-  h += `<label style="display:inline-flex;align-items:center;gap:4px;font-size:12.5px;cursor:pointer;margin-left:8px;border-left:1px solid #ddd;padding-left:10px"><input type="checkbox" data-media="1" ${safraMedia ? "checked" : ""}><span style="font-weight:600">Média (25/24/23)</span></label></div>`;
-  h += `<div style="display:flex;align-items:center;gap:10px;margin-top:10px"><span class="hint" style="white-space:nowrap">Período:</span><input type="range" id="safraRange" min="6" max="${S.tabs.length}" value="${Math.min(safraMeses, S.tabs.length)}" step="1" style="flex:1;max-width:360px"><span class="hint" id="safraRangeLab" style="white-space:nowrap"></span></div>`;
+  h += `<label style="display:inline-flex;align-items:center;gap:4px;font-size:12.5px;cursor:pointer;margin-left:8px;border-left:1px solid #ddd;padding-left:10px"><input type="checkbox" data-media="1" ${safraMedia ? "checked" : ""}><span style="font-weight:600">${t("Média (25/24/23)", "Average (25/24/23)")}</span></label></div>`;
+  h += `<div style="display:flex;align-items:center;gap:10px;margin-top:10px"><span class="hint" style="white-space:nowrap">${t("Período:", "Period:")}</span><input type="range" id="safraRange" min="6" max="${S.tabs.length}" value="${Math.min(safraMeses, S.tabs.length)}" step="1" style="flex:1;max-width:360px"><span class="hint" id="safraRangeLab" style="white-space:nowrap"></span></div>`;
   cont.innerHTML = h;
   cont.querySelectorAll("button[data-vis]").forEach((b) => b.addEventListener("click", () => { safraVis = b.dataset.vis; renderSafrasSel(); renderSafras(); }));
   cont.querySelectorAll("button[data-modo]").forEach((b) => b.addEventListener("click", () => { safraModo = b.dataset.modo; renderSafrasSel(); renderSafras(); }));
@@ -777,15 +801,23 @@ function renderSafrasSel() {
 function atualizaLabelPeriodo() {
   const lab = document.getElementById("safraRangeLab"); if (!lab) return;
   const total = S.tabs.length, N = Math.min(safraMeses, total), ini = total - N;
-  lab.textContent = `${N} meses  (${mesLabSafra(S.tabs[ini])} → ${mesLabSafra(S.tabs[total - 1])})`;
+  lab.textContent = `${N} ${t("meses", "months")}  (${mesLabSafra(S.tabs[ini])} → ${mesLabSafra(S.tabs[total - 1])})`;
 }
 const mediaCruMes = (cat, gIdx) => { const vals = [2025, 2024, 2023].map((am) => varCru(cat, am, S.tabs[gIdx])).filter((x) => x != null); return vals.length ? +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : null; };
 function atualizaNotaSafras() {
   const nota = document.getElementById("safrasNota"); if (!nota) return;
   const txtModo = safraModo === "var"
-    ? `Na visão <b>Variação</b>, a linha é a <b>média móvel de 3 meses</b> (suaviza o ruído) — passe o mouse pra ver também o dado cru do mês.`
-    : `Na visão <b>Acumulado</b>, é a variação de preço acumulada de cada safra (negativo = depreciou; positivo = valorizou — as safras 2019-2020 subiram na pandemia).`;
-  nota.innerHTML = `<b>Como ler:</b> cada linha é um <b>ano-modelo</b> seguido mês a mês ao longo do tempo (mesmo após o ano de modelo), sempre o mesmo carro → sem degrau de virada de ano. ${txtModo} A média móvel de 3 meses mostra se a depreciação está <b>acelerando ou aliviando na ponta</b>. Categoria <b>${safraCat}</b>, ponderado pelo volume do mix.`;
+    ? t(`Na visão <b>Variação</b>, a linha é a <b>média móvel de 3 meses</b> (suaviza o ruído) — passe o mouse pra ver também o dado cru do mês.`,
+        `In the <b>Variation</b> view, the line is the <b>3-month moving average</b> (smooths the noise) — hover to also see the raw monthly figure.`)
+    : t(`Na visão <b>Acumulado</b>, é a variação de preço acumulada de cada safra (negativo = depreciou; positivo = valorizou — as safras 2019-2020 subiram na pandemia).`,
+        `In the <b>Cumulative</b> view, it is each vintage's cumulative price variation (negative = depreciated; positive = appreciated — the 2019-2020 vintages rose during the pandemic).`);
+  nota.innerHTML = t(`<b>Como ler:</b> cada linha é um <b>ano-modelo</b> seguido mês a mês ao longo do tempo (mesmo após o ano de modelo), sempre o mesmo carro → sem degrau de virada de ano. `,
+                     `<b>How to read it:</b> each line is a <b>model year</b> tracked month by month over time (even past its model year), always the same car → no year-turn step. `)
+    + txtModo
+    + t(` A média móvel de 3 meses mostra se a depreciação está <b>acelerando ou aliviando na ponta</b>. Categoria <b>`,
+        ` The 3-month moving average shows whether depreciation is <b>accelerating or easing at the latest point</b>. Category <b>`)
+    + catLbl(safraCat)
+    + t(`</b>, ponderado pelo volume do mix.`, `</b>, weighted by mix volume.`);
 }
 function renderSafras() {
   const wrap = document.getElementById("safrasChartWrap"), tabEl = document.getElementById("safrasTabela");
@@ -801,7 +833,7 @@ function renderSafras() {
   };
   const ds = [];
   for (const am of S.anos) if (safrasSel.has(am)) ds.push({ label: String(am), _am: am, data: corta(serieSafra(safraCat, am)), borderColor: SAFRA_CORES[am] || "#888", backgroundColor: SAFRA_CORES[am] || "#888", borderWidth: 2.2, pointRadius: 0, tension: .25, spanGaps: false });
-  if (safraMedia) ds.push({ label: "Média 25/24/23", _media: true, data: corta(serieMediaSafra(safraCat)), borderColor: "#111", backgroundColor: "#111", borderWidth: 3, borderDash: [6, 3], pointRadius: 0, tension: .25, spanGaps: false });
+  if (safraMedia) ds.push({ label: t("Média 25/24/23", "Average 25/24/23"), _media: true, data: corta(serieMediaSafra(safraCat)), borderColor: "#111", backgroundColor: "#111", borderWidth: 3, borderDash: [6, 3], pointRadius: 0, tension: .25, spanGaps: false });
   if (charts.cSafras) charts.cSafras.destroy();
   charts.cSafras = new Chart(document.getElementById("cSafras"), {
     type: "line", data: { labels, datasets: ds },
@@ -812,20 +844,20 @@ function renderSafras() {
         tooltip: { callbacks: { label: (c) => {
           const gIdx = safraIni + c.dataIndex;
           if (safraModo === "var") {
-            const ln = c.parsed.y == null ? "—" : (c.parsed.y >= 0 ? "+" : "") + c.parsed.y.toFixed(2).replace(".", ",") + "%/mês";
+            const ln = c.parsed.y == null ? "—" : (c.parsed.y >= 0 ? "+" : "") + c.parsed.y.toFixed(2).replace(".", ",") + t("%/mês", "%/mo");
             const cru = c.dataset._am != null ? varCru(safraCat, c.dataset._am, S.tabs[gIdx]) : (c.dataset._media ? mediaCruMes(safraCat, gIdx) : null);
-            const cruStr = cru == null ? "" : `   ·  mês: ${(cru >= 0 ? "+" : "") + cru.toFixed(2).replace(".", ",")}%`;
-            return `${c.dataset.label}: ${ln} (méd 3m)${cruStr}`;
+            const cruStr = cru == null ? "" : `   ·  ${t("mês", "month")}: ${(cru >= 0 ? "+" : "") + cru.toFixed(2).replace(".", ",")}%`;
+            return `${c.dataset.label}: ${ln}${t(" (méd 3m)", " (3m avg)")}${cruStr}`;
           }
           const val = c.parsed.y == null ? "—" : (c.parsed.y >= 0 ? "+" : "") + c.parsed.y.toFixed(1).replace(".", ",") + "%";
           const mm = c.dataset._am != null ? mm3Safra(safraCat, c.dataset._am, gIdx) : (c.dataset._media ? mm3Media(safraCat, gIdx) : null);
-          const mmStr = mm == null ? "" : `   ·  méd 3m: ${(mm >= 0 ? "+" : "") + mm.toFixed(2).replace(".", ",")}%/mês`;
+          const mmStr = mm == null ? "" : `   ·  ${t("méd 3m", "3m avg")}: ${(mm >= 0 ? "+" : "") + mm.toFixed(2).replace(".", ",")}${t("%/mês", "%/mo")}`;
           return `${c.dataset.label}: ${val}${mmStr}`;
         } } },
       },
       scales: {
         x: { ticks: { color: CG.tick, maxRotation: 60, autoSkip: true, maxTicksLimit: 14 }, grid: { color: CG.grid } },
-        y: { title: { display: true, text: safraModo === "var" ? "variação m/m suavizada (méd 3m, %)" : "variação de preço acumulada (%)", color: CG.tick }, ticks: { color: CG.tick, callback: (v) => (v > 0 ? "+" : "") + v + "%" }, grid: { color: CG.grid } },
+        y: { title: { display: true, text: safraModo === "var" ? t("variação m/m suavizada (méd 3m, %)", "smoothed m/m variation (3m avg, %)") : t("variação de preço acumulada (%)", "cumulative price variation (%)"), color: CG.tick }, ticks: { color: CG.tick, callback: (v) => (v > 0 ? "+" : "") + v + "%" }, grid: { color: CG.grid } },
       },
     },
   });
@@ -838,12 +870,12 @@ function renderSafrasTabela() {
   const idxCols = []; for (let g = total - nCols; g < total; g++) idxCols.push(g);
   const linhas = [];
   for (const am of S.anos) if (safrasSel.has(am)) linhas.push({ label: String(am), cor: SAFRA_CORES[am] || "#888", am });
-  if (safraMedia) linhas.push({ label: "Média 25/24/23", cor: "#111", media: true });
+  if (safraMedia) linhas.push({ label: t("Média 25/24/23", "Average 25/24/23"), cor: "#111", media: true });
   const HL = "background:rgba(31,157,85,.14);border-left:2px solid rgba(31,157,85,.55);";
   const cel = (v, extra) => { const cor = v == null ? "#aaa" : (v < 0 ? "#c0392b" : (v > 0 ? "#1f9d55" : "#666")); const txt = v == null ? "—" : (v >= 0 ? "+" : "") + v.toFixed(1).replace(".", ",") + "%"; return `<td style="text-align:right;padding:4px 9px;color:${cor};${extra || ""}">${txt}</td>`; };
-  let h = `<table class="mod-tab" style="font-size:12.5px;white-space:nowrap"><thead><tr><th style="text-align:left">Safra <span class="hint">(variação % no mês)</span></th>`;
+  let h = `<table class="mod-tab" style="font-size:12.5px;white-space:nowrap"><thead><tr><th style="text-align:left">${t("Safra", "Vintage")} <span class="hint">${t("(variação % no mês)", "(% variation in the month)")}</span></th>`;
   idxCols.forEach((g) => { h += `<th style="text-align:right;padding:4px 9px">${mesLabSafra(S.tabs[g])}</th>`; });
-  h += `<th style="text-align:right;padding:4px 9px;${HL}font-weight:700">méd 3m</th></tr></thead><tbody>`;
+  h += `<th style="text-align:right;padding:4px 9px;${HL}font-weight:700">${t("méd 3m", "3m avg")}</th></tr></thead><tbody>`;
   for (const ln of linhas) {
     h += `<tr><td style="text-align:left"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${ln.cor};margin-right:6px"></span>${ln.label}</td>`;
     idxCols.forEach((g) => { const v = ln.media ? mediaCruMes(safraCat, g) : varCru(safraCat, ln.am, S.tabs[g]); h += cel(v); });
@@ -868,8 +900,8 @@ function renderFrotas() {
   const pondDe = (emp) => (pondWanted === "volume" && cob[emp] && cob[emp].tem_volume) ? "volume" : "igual";
 
   const notes = [];
-  if (pondWanted === "volume") empresas.forEach((e) => { if (cob[e] && !cob[e].tem_volume) notes.push(`${e}: sem volume informado → peso igual`); });
-  if (nivel === "trim") notes.push("Versão (trim): casamento aproximado — a FIPE rotula versões de forma inconsistente.");
+  if (pondWanted === "volume") empresas.forEach((e) => { if (cob[e] && !cob[e].tem_volume) notes.push(`${e}: ${t("sem volume informado → peso igual", "no volume reported → equal weight")}`); });
+  if (nivel === "trim") notes.push(t("Versão (trim): casamento aproximado — a FIPE rotula versões de forma inconsistente.", "Version (trim): approximate matching — FIPE labels versions inconsistently."));
   document.getElementById("frNote").textContent = notes.join(" · ");
 
   const lineEmp = (emp, pts, fmtOpts) => ({ label: emp, data: pts, borderColor: COR_EMP[emp], backgroundColor: COR_EMP[emp], borderWidth: 2.5, pointRadius: 2, tension: 0.25, spanGaps: true, ...fmtOpts });
@@ -883,7 +915,7 @@ function renderFrotas() {
     });
     return lineEmp(emp, pts);
   });
-  mkChart("cFrCurva", "line", dsCurva, idades.map((i) => i + " ano" + (i === 1 ? "" : "s")), fpct, ehSpread ? "% perdido vs 0 km" : "% retido do valor de novo");
+  mkChart("cFrCurva", "line", dsCurva, idades.map(anosLbl), fpct, ehSpread ? t("% perdido vs 0 km", "% lost vs 0 km") : t("% retido do valor de novo", "% of new-car value retained"));
 
   // gap no tempo
   const dsGap = empresas.map((emp) => {
@@ -892,7 +924,7 @@ function renderFrotas() {
       .forEach((x) => { pts[TAB_IDX[x.codigo_tabela]] = +(x.spread * 100).toFixed(1); });
     return lineEmp(emp, pts);
   });
-  mkChart("cFrGap", "line", W(dsGap), winLabels(), fpct, "spread (% abaixo do 0 km)");
+  mkChart("cFrGap", "line", W(dsGap), winLabels(), fpct, t("spread (% abaixo do 0 km)", "spread (% below 0 km)"));
 
   // indice 100
   const dsInd = empresas.map((emp) => {
@@ -901,15 +933,15 @@ function renderFrotas() {
       .forEach((x) => { pts[TAB_IDX[x.codigo_tabela]] = x.indice; });
     return lineEmp(emp, pts);
   });
-  mkChart("cFrIndice", "line", Widx(dsInd), winLabels(), (v) => (v == null ? "" : v.toFixed(0)), "índice (100 = 1º mês visível)");
+  mkChart("cFrIndice", "line", Widx(dsInd), winLabels(), (v) => (v == null ? "" : v.toFixed(0)), t("índice (100 = 1º mês visível)", "index (100 = first visible month)"));
 
   // cobertura
   const cobTxt = empresas.map((emp) => {
     const c = cob[emp];
     const dentro = c.dentro.map((x) => x.nameplate + (c.tem_volume ? ` <span style="color:#999">(${x.peso})</span>` : "")).join(", ");
     const fora = c.fora.map((f) => (typeof f === "string" ? f : f.trim).split(" ").slice(0, 3).join(" ")).join("; ");
-    const covVol = c.cobertura_vol != null ? ` · <b>${(c.cobertura_vol * 100).toFixed(0)}% da frota por volume</b>` : "";
-    return `<b style="color:${COR_EMP[emp]}">${emp}</b> — ${c.n_nameplates} modelos na base${covVol}${c.tem_volume ? " (nº = volume)" : ""} · ${c.fora.length} fora.<br>Dentro: ${dentro}<br><span style="color:#b06a00">Fora da base: ${fora}</span>`;
+    const covVol = c.cobertura_vol != null ? ` · <b>${(c.cobertura_vol * 100).toFixed(0)}%${t(" da frota por volume", " of the fleet by volume")}</b>` : "";
+    return `<b style="color:${COR_EMP[emp]}">${emp}</b> — ${c.n_nameplates} ${t("modelos na base", "models in the base")}${covVol}${c.tem_volume ? t(" (nº = volume)", " (no. = volume)") : ""} · ${c.fora.length} ${t("fora", "out")}.<br>${t("Dentro", "Inside")}: ${dentro}<br><span style="color:#b06a00">${t("Fora da base", "Outside the base")}: ${fora}</span>`;
   }).join("<br><br>");
   document.getElementById("frCobertura").innerHTML = cobTxt;
 }
@@ -920,15 +952,16 @@ function renderTendencias() {
   const [cc, seg] = document.getElementById("segCurva").value.split("|");
   const idades = Array.from({ length: D.meta.idade_max + 1 }, (_, i) => i);
   const refs = ["Atual", "1 mês atrás", "6 meses atrás", "12 meses atrás"];
+  const refLbl = (r) => t(r, { "Atual": "Current", "1 mês atrás": "1 month ago", "6 meses atrás": "6 months ago", "12 meses atrás": "12 months ago" }[r] || r);
   const dsCt = refs.map((ref, i) => {
     const pts = idades.map((id) => {
       const r = D.curva_tempo.find((x) => x.corte === cc && x.segmento === seg && x.ref === ref && x.idade === id);
       return r ? +((ehSpread ? r.spread_mediana : r.retencao_mediana) * 100).toFixed(1) : null;
     });
-    return baseLine(ref, pts, i);
+    return baseLine(refLbl(ref), pts, i);
   }).filter((d) => d.data.some((v) => v != null));
-  mkChart("cCurvaTempo", "line", dsCt, idades.map((i) => i + " ano" + (i === 1 ? "" : "s")), fpct,
-    ehSpread ? "% perdido vs 0 km" : "% retido do valor de novo");
+  mkChart("cCurvaTempo", "line", dsCt, idades.map(anosLbl), fpct,
+    ehSpread ? t("% perdido vs 0 km", "% lost vs 0 km") : t("% retido do valor de novo", "% of new-car value retained"));
 
   const segs = segmentosDoCorte(corte);
   const dsIdx = segs.map((seg2, i) => {
@@ -937,43 +970,43 @@ function renderTendencias() {
       .forEach((x) => { pts[TAB_IDX[x.codigo_tabela]] = x.indice_100; });
     return baseLine(seg2, pts, i);
   });
-  mkChart("cIndice", "line", Widx(dsIdx), winLabels(), (v) => (v == null ? "" : v.toFixed(0)), "índice (base 100 = 1º mês visível)");
+  mkChart("cIndice", "line", Widx(dsIdx), winLabels(), (v) => (v == null ? "" : v.toFixed(0)), t("índice (base 100 = 1º mês visível)", "index (base 100 = first visible month)"));
 }
 
 const AGE_KEY = { "0": "novo", "1": "a1", "2": "a2", "3": "a3" };
-const AGE_LBL = { "0": "0 km", "1": "1 ano", "2": "2 anos", "3": "3 anos" };
+const AGE_LBL = { "0": "0 km", "1": t("1 ano", "1 year"), "2": t("2 anos", "2 years"), "3": t("3 anos", "3 years") };
 function indexar100(arr) {
   const base = arr.find((v) => v != null);
   return base ? arr.map((v) => (v == null ? null : +(100 * v / base).toFixed(1))) : arr.slice();
 }
 let selMod = ["Mobi"]; // nameplates selecionados (estado da aba Por modelo)
 const rsCurto = (v) => (v == null ? "—" : "R$ " + Math.round(v / 1000) + "k");
-const rsCheio = (v) => (v == null ? "—" : "R$ " + Math.round(v).toLocaleString("pt-BR"));
+const rsCheio = (v) => (v == null ? "—" : "R$ " + Math.round(v).toLocaleString(LANG === "en" ? "en-US" : "pt-BR"));
 const gapStr = (a, nv) => (a != null && nv) ? ((1 - a / nv) * 100).toFixed(1).replace(".", ",") + "%" : "—";
 
 function renderModChips() {
   const c = document.getElementById("modChips");
-  c.innerHTML = selMod.map((np) => { const m = D.por_modelo.find((x) => x.nameplate === np); return `<span class="chip"><b>${np}</b>${m ? " · " + m.marca.split(" ")[0] : ""} <span data-rm="${np}" title="remover">×</span></span>`; }).join("");
+  c.innerHTML = selMod.map((np) => { const m = D.por_modelo.find((x) => x.nameplate === np); return `<span class="chip"><b>${np}</b>${m ? " · " + m.marca.split(" ")[0] : ""} <span data-rm="${np}" title="${t("remover", "remove")}">×</span></span>`; }).join("");
   c.querySelectorAll("[data-rm]").forEach((el) => el.addEventListener("click", () => { selMod = selMod.filter((x) => x !== el.dataset.rm); syncPicker(); renderModelo(); }));
 }
 function renderModKpis(mods) {
   const el = document.getElementById("modKpis");
   if (!mods.length) { el.innerHTML = ""; return; }
   const m = mods[0], L = m.novo.length - 1;
-  const gp = (a) => (a != null && m.novo[L]) ? `${((1 - a / m.novo[L]) * 100).toFixed(0)}% abaixo` : "";
+  const gp = (a) => (a != null && m.novo[L]) ? `${((1 - a / m.novo[L]) * 100).toFixed(0)}% ${t("abaixo", "below")}` : "";
   const cards = [
     { v: rsCurto(m.novo[L]), g: "", l: `${m.nameplate} · 0 km` },
-    { v: rsCurto(m.a1[L]), g: gp(m.a1[L]), l: "1 ano" },
-    { v: rsCurto(m.a2[L]), g: gp(m.a2[L]), l: "2 anos" },
-    { v: rsCurto(m.a3[L]), g: gp(m.a3[L]), l: "3 anos" },
+    { v: rsCurto(m.a1[L]), g: gp(m.a1[L]), l: t("1 ano", "1 year") },
+    { v: rsCurto(m.a2[L]), g: gp(m.a2[L]), l: t("2 anos", "2 years") },
+    { v: rsCurto(m.a3[L]), g: gp(m.a3[L]), l: t("3 anos", "3 years") },
   ];
   el.innerHTML = cards.map((c) => `<div class="mod-kpi"><div class="v">${c.v}</div>${c.g ? `<div class="g">${c.g}</div>` : ""}<div class="l">${c.l}</div></div>`).join("");
 }
 function renderModTabela(mods) {
   const el = document.getElementById("modTabela");
-  if (!mods.length) { el.innerHTML = '<p class="hint">Selecione um modelo.</p>'; return; }
+  if (!mods.length) { el.innerHTML = `<p class="hint">${t("Selecione um modelo.", "Select a model.")}</p>`; return; }
   const L = mods[0].novo.length - 1;
-  let h = `<table class="mod-tab"><thead><tr><th>Modelo · ${D.meta.periodo.ate}</th><th>0 km</th><th>1 ano</th><th>gap</th><th>2 anos</th><th>gap</th><th>3 anos</th><th>gap</th></tr></thead><tbody>`;
+  let h = `<table class="mod-tab"><thead><tr><th>${t("Modelo", "Model")} · ${mesLbl(D.meta.periodo.ate)}</th><th>0 km</th><th>${t("1 ano", "1 year")}</th><th>gap</th><th>${t("2 anos", "2 years")}</th><th>gap</th><th>${t("3 anos", "3 years")}</th><th>gap</th></tr></thead><tbody>`;
   mods.forEach((m) => { const nv = m.novo[L]; h += `<tr><td><b>${m.nameplate}</b> <span class="hint">${m.marca.split(" ")[0]}</span></td><td>${rsCheio(nv)}</td><td>${rsCheio(m.a1[L])}</td><td>${gapStr(m.a1[L], nv)}</td><td>${rsCheio(m.a2[L])}</td><td>${gapStr(m.a2[L], nv)}</td><td>${rsCheio(m.a3[L])}</td><td>${gapStr(m.a3[L], nv)}</td></tr>`; });
   el.innerHTML = h + "</tbody></table>";
 }
@@ -999,41 +1032,41 @@ function renderModelo() {
   if (modo === "safra") {
     const mods0 = selMod.map((n) => D.por_modelo.find((m) => m.nameplate === n)).filter(Boolean);
     renderModKpis(mods0); renderModTabela(mods0);
-    if (!mods0.length) { hint.textContent = "Selecione um modelo no painel à esquerda."; if (charts.cModelo) { charts.cModelo.destroy(); charts.cModelo = null; } return; }
+    if (!mods0.length) { hint.textContent = t("Selecione um modelo no painel à esquerda.", "Select a model in the panel on the left."); if (charts.cModelo) { charts.cModelo.destroy(); charts.cModelo = null; } return; }
     const m = mods0[0];
-    hint.innerHTML = `<b>${m.nameplate}</b> (${m.marca}) — variação de preço <b>acumulada</b> de cada <b>ano-modelo</b> (safra), seguido mês a mês. Mesma lógica do gráfico da frota Localiza: sempre o mesmo carro, sem degrau de virada de ano.${mods0.length > 1 ? " Usa o 1º selecionado." : ""}`;
+    hint.innerHTML = `<b>${m.nameplate}</b> (${m.marca}) — ` + t(`variação de preço <b>acumulada</b> de cada <b>ano-modelo</b> (safra), seguido mês a mês. Mesma lógica do gráfico da frota Localiza: sempre o mesmo carro, sem degrau de virada de ano.`, `<b>cumulative</b> price variation of each <b>model year</b> (vintage), tracked month by month. Same logic as the Localiza fleet chart: always the same car, no year-turn step.`) + (mods0.length > 1 ? t(" Usa o 1º selecionado.", " Uses the first selected.") : "");
     const dsS = [];
     for (const am of [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019]) { const s = serieSafraModelo(m.nameplate, am); if (s.some((x) => x != null)) dsS.push({ label: String(am), data: s, borderColor: SAFRA_CORES[am] || "#888", backgroundColor: SAFRA_CORES[am] || "#888", borderWidth: 2, pointRadius: 0, tension: .2, spanGaps: false }); }
     const pf = (v) => v == null ? "" : (v > 0 ? "+" : "") + v.toFixed(0) + "%";
     const pt = (v) => v == null ? "" : (v > 0 ? "+" : "") + v.toFixed(1).replace(".", ",") + "%";
-    mkChart("cModelo", "line", Wacum(dsS), winLabels(), pf, "variação de preço acumulada (%)", pt);
+    mkChart("cModelo", "line", Wacum(dsS), winLabels(), pf, t("variação de preço acumulada (%)", "cumulative price variation (%)"), pt);
     return;
   }
   const gapArr = (obj, key) => obj[key].map((v, i) => (v != null && obj.novo[i]) ? +(((1 - v / obj.novo[i])) * 100).toFixed(1) : null);
   const serie = (obj, key) => (gap ? gapArr(obj, key) : ind ? indexar100(obj[key]) : obj[key].slice());
   const mods = selMod.map((n) => D.por_modelo.find((m) => m.nameplate === n)).filter(Boolean);
   renderModKpis(mods); renderModTabela(mods);
-  if (!mods.length) { hint.textContent = "Selecione ao menos um modelo no painel à esquerda."; if (charts.cModelo) { charts.cModelo.destroy(); charts.cModelo = null; } return; }
+  if (!mods.length) { hint.textContent = t("Selecione ao menos um modelo no painel à esquerda.", "Select at least one model in the panel on the left."); if (charts.cModelo) { charts.cModelo.destroy(); charts.cModelo = null; } return; }
   let ds = [], ci = 0;
   if (modo === "evolucao") {
     const m = mods[0];
-    hint.textContent = (mods.length > 1 ? `Modo evolução usa o 1º selecionado (${m.nameplate}). ` : "") +
-      (gap ? `Gap (% abaixo do 0 km) do ${m.nameplate} aos 1, 2 e 3 anos — quanto mais velho, maior.` : `${m.nameplate} (${m.marca}) — 0 km e seminovo de 1, 2 e 3 anos.`);
-    const camadas = gap ? [["a1", "1 ano"], ["a2", "2 anos"], ["a3", "3 anos"]] : [["novo", "0 km"], ["a1", "1 ano"], ["a2", "2 anos"], ["a3", "3 anos"]];
+    hint.textContent = (mods.length > 1 ? t(`Modo evolução usa o 1º selecionado (${m.nameplate}). `, `Evolution mode uses the first selected (${m.nameplate}). `) : "") +
+      (gap ? t(`Gap (% abaixo do 0 km) do ${m.nameplate} aos 1, 2 e 3 anos — quanto mais velho, maior.`, `${m.nameplate} gap (% below 0 km) at 1, 2 and 3 years — the older, the larger.`) : t(`${m.nameplate} (${m.marca}) — 0 km e seminovo de 1, 2 e 3 anos.`, `${m.nameplate} (${m.marca}) — 0 km and used at 1, 2 and 3 years.`));
+    const camadas = gap ? [["a1", t("1 ano", "1 year")], ["a2", t("2 anos", "2 years")], ["a3", t("3 anos", "3 years")]] : [["novo", "0 km"], ["a1", t("1 ano", "1 year")], ["a2", t("2 anos", "2 years")], ["a3", t("3 anos", "3 years")]];
     camadas.forEach(([key, lbl]) => ds.push(baseLine(lbl, serie(m, key), ci++)));
   } else {
     const key = AGE_KEY[idade];
     hint.textContent = mods.length > 1
-      ? `Comparando ${mods.length} modelos${gap ? " no gap" : " no preço"} de ${AGE_LBL[idade]}.`
-      : `${mods[0].nameplate} (${mods[0].marca}) — ${gap ? "gap" : "preço"} de ${AGE_LBL[idade]}.`;
+      ? t(`Comparando ${mods.length} modelos${gap ? " no gap" : " no preço"} de ${AGE_LBL[idade]}.`, `Comparing ${mods.length} models${gap ? " on gap" : " on price"} at ${AGE_LBL[idade]}.`)
+      : t(`${mods[0].nameplate} (${mods[0].marca}) — ${gap ? "gap" : "preço"} de ${AGE_LBL[idade]}.`, `${mods[0].nameplate} (${mods[0].marca}) — ${gap ? "gap" : "price"} at ${AGE_LBL[idade]}.`);
     mods.forEach((m) => ds.push(baseLine(m.nameplate, serie(m, key), ci++)));
     if (trims && mods.length === 1) {
       mods[0].trims.forEach((t) => { const d = baseLine(t.modelo, serie(t, key), ci++); d.borderWidth = 1; d.pointRadius = 0; d.borderDash = [3, 3]; ds.push(d); });
-    } else if (trims) { hint.textContent += " (versões só com 1 modelo selecionado)"; }
+    } else if (trims) { hint.textContent += t(" (versões só com 1 modelo selecionado)", " (versions only with 1 model selected)"); }
   }
   const yf = (v) => (v == null ? "" : gap ? v.toFixed(0) + "%" : ind ? v.toFixed(0) : "R$ " + (v / 1000).toFixed(0) + "k");
-  const tf = (v) => (v == null ? "" : gap ? v.toFixed(1).replace(".", ",") + "%" : ind ? v.toFixed(1) : "R$ " + Math.round(v).toLocaleString("pt-BR"));
-  mkChart("cModelo", "line", (ind ? Widx : W)(ds), winLabels(), yf, gap ? "gap (% abaixo do 0 km)" : ind ? "índice (base 100 = 1º mês visível)" : "preço (R$)", tf);
+  const tf = (v) => (v == null ? "" : gap ? v.toFixed(1).replace(".", ",") + "%" : ind ? v.toFixed(1) : "R$ " + Math.round(v).toLocaleString(LANG === "en" ? "en-US" : "pt-BR"));
+  mkChart("cModelo", "line", (ind ? Widx : W)(ds), winLabels(), yf, gap ? t("gap (% abaixo do 0 km)", "gap (% below 0 km)") : ind ? t("índice (base 100 = 1º mês visível)", "index (base 100 = first visible month)") : t("preço (R$)", "price (R$)"), tf);
 }
 // ---- picker de modelos (busca + checkboxes agrupados) ----
 function syncPicker() { document.querySelectorAll("#modLista input[type=checkbox]").forEach((cb) => { cb.checked = selMod.includes(cb.value); }); }
@@ -1041,7 +1074,7 @@ function buildPicker() {
   const cont = document.getElementById("modLista");
   let grupo = null;
   D.por_modelo.forEach((m) => {
-    if (m.categoria !== grupo) { grupo = m.categoria; const hh = document.createElement("div"); hh.className = "mod-cat"; hh.textContent = grupo === "Compact Sedan" ? "Sedan" : grupo; cont.appendChild(hh); }
+    if (m.categoria !== grupo) { grupo = m.categoria; const hh = document.createElement("div"); hh.className = "mod-cat"; hh.textContent = grupo === "Compact Sedan" ? "Sedan" : catLbl(grupo); cont.appendChild(hh); }
     const lab = document.createElement("label"); lab.className = "mod-opt"; lab.dataset.nome = (m.nameplate + " " + m.marca).toLowerCase();
     lab.innerHTML = `<input type="checkbox" value="${m.nameplate}"><span>${m.nameplate}</span><span class="mk">${m.marca.split(" ")[0]}</span>`;
     const cb = lab.querySelector("input"); cb.checked = selMod.includes(m.nameplate);
@@ -1054,9 +1087,9 @@ function buildPicker() {
 (function () {
   const sc = document.getElementById("segCurva");
   const add = (v, t) => { const o = document.createElement("option"); o.value = v; o.textContent = t; sc.appendChild(o); };
-  add("Consolidado|Todos", "Consolidado");
-  ORDEM_CAT.forEach((c) => add("Categoria|" + c, c));
-  ORDEM_ORI.forEach((o) => add("Origem|" + o, o));
+  add("Consolidado|Todos", t("Consolidado", "Consolidated"));
+  ORDEM_CAT.forEach((c) => add("Categoria|" + c, catLbl(c)));
+  ORDEM_ORI.forEach((o) => add("Origem|" + o, catLbl(o)));
 })();
 buildPicker();
 // busca: filtra opções e esconde cabeçalhos de categoria sem itens
@@ -1074,11 +1107,11 @@ document.querySelectorAll(".mod-quick button").forEach((b) => b.addEventListener
 
 // ---------- abas ----------
 const TABS = [
-  { id: "frotas", label: "Frotas (Localiza × Movida)" },
-  { id: "visao", label: "Visão geral" },
-  { id: "modelo", label: "Por modelo" },
-  { id: "tend", label: "Tendências" },
-  { id: "metodo", label: "Metodologia" },
+  { id: "frotas", label: t("Frotas (Localiza × Movida)", "Fleets (Localiza × Movida)") },
+  { id: "visao", label: t("Visão geral", "Overview") },
+  { id: "modelo", label: t("Por modelo", "By model") },
+  { id: "tend", label: t("Tendências", "Trends") },
+  { id: "metodo", label: t("Metodologia", "Methodology") },
 ];
 let activeTab = "frotas";
 function renderActive() {
@@ -1126,6 +1159,11 @@ document.getElementById("mesReset").addEventListener("click", () => {
 });
 
 // ---------- init ----------
+// aplica as traduções estáticas (data-en) uma única vez, com o DOM já montado
+if (LANG === 'en') {
+  document.querySelectorAll('[data-en]').forEach(function (e) { e.innerHTML = e.getAttribute('data-en'); });
+  var _mb = document.getElementById('modBusca'); if (_mb) _mb.placeholder = '🔍 Search model...';
+}
 kpis();
 activate("frotas");
 </script>

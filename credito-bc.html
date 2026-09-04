@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Crédito para Auto — Banco Central</title>
+<title data-en="Auto Credit — Central Bank">Crédito para Auto — Banco Central</title>
 <script src="chart.umd.min.js"></script>
 <script src="dados_credito_bc.js"></script>
 <script>
@@ -54,18 +54,18 @@
 <header class="topbar">
   <div class="logo">
     <div class="logo-mark">$</div>
-    <div class="logo-text">Crédito para Auto — Banco Central <span>Financiamento de veículos · PF e PJ</span></div>
+    <div class="logo-text" data-en="Auto Credit — Central Bank <span>Vehicle financing · Individuals and companies</span>">Crédito para Auto — Banco Central <span>Financiamento de veículos · PF e PJ</span></div>
   </div>
   <div class="sub2" id="sub"></div>
 </header>
 
 <div class="wrap">
   <div class="controls">
-    <div class="ctl"><label>Período</label>
+    <div class="ctl"><label data-en="Period">Período</label>
       <select id="periodo">
-        <option value="60">Últimos 5 anos</option>
-        <option value="120">Últimos 10 anos</option>
-        <option value="0" selected>Desde 2011</option>
+        <option value="60" data-en="Last 5 years">Últimos 5 anos</option>
+        <option value="120" data-en="Last 10 years">Últimos 10 anos</option>
+        <option value="0" selected data-en="Since 2011">Desde 2011</option>
       </select>
     </div>
   </div>
@@ -74,28 +74,28 @@
 
   <div class="grid">
     <div class="card">
-      <h2>Saldo de crédito para veículos</h2>
-      <p>Carteira (estoque) em R$ bilhões. Recursos livres.</p>
+      <h2 data-en="Vehicle credit balance (outstanding)">Saldo de crédito para veículos</h2>
+      <p data-en="Loan book (outstanding) in R$ billions. Non-earmarked funds.">Carteira (estoque) em R$ bilhões. Recursos livres.</p>
       <div class="chartbox"><canvas id="cSaldo"></canvas></div>
     </div>
     <div class="card">
-      <h2>Concessões mensais</h2>
-      <p>Crédito novo originado no mês, em R$ bilhões.</p>
+      <h2 data-en="Monthly new lending">Concessões mensais</h2>
+      <p data-en="New credit originated in the month, in R$ billions.">Crédito novo originado no mês, em R$ bilhões.</p>
       <div class="chartbox"><canvas id="cConc"></canvas></div>
     </div>
     <div class="card full">
-      <h2>Concessões — variação YoY</h2>
-      <p>Crescimento das concessões do mês vs o mesmo mês do ano anterior (%). Acima de zero = mais crédito novo que há 12 meses.</p>
+      <h2 data-en="New lending — YoY change">Concessões — variação YoY</h2>
+      <p data-en="Growth in the month's new lending vs the same month a year earlier (%). Above zero = more new credit than 12 months ago.">Crescimento das concessões do mês vs o mesmo mês do ano anterior (%). Acima de zero = mais crédito novo que há 12 meses.</p>
       <div class="chartbox"><canvas id="cConcYoY"></canvas></div>
     </div>
     <div class="card">
-      <h2>Taxa de juros média</h2>
-      <p>% ao ano. Quanto custa financiar um veículo.</p>
+      <h2 data-en="Average interest rate">Taxa de juros média</h2>
+      <p data-en="% per annum. The cost of financing a vehicle.">% ao ano. Quanto custa financiar um veículo.</p>
       <div class="chartbox"><canvas id="cJuros"></canvas></div>
     </div>
     <div class="card">
-      <h2>Inadimplência (atrasos &gt; 90 dias)</h2>
-      <p>% da carteira em atraso.</p>
+      <h2 data-en="Delinquency (arrears &gt; 90 days)">Inadimplência (atrasos &gt; 90 dias)</h2>
+      <p data-en="% of the loan book in arrears.">% da carteira em atraso.</p>
       <div class="chartbox"><canvas id="cInad"></canvas></div>
     </div>
   </div>
@@ -104,13 +104,20 @@
 </div>
 
 <script>
+// ===== i18n: o hub controla o idioma via ?lang; PT é o padrão =====
+var LANG = 'pt';
+try { var _ul = new URLSearchParams(location.search).get('lang'); if (_ul === 'en' || _ul === 'pt') LANG = _ul; } catch(e){}
+function t(pt, en){ return LANG === 'en' ? en : pt; }
+document.documentElement.lang = LANG === 'en' ? 'en' : 'pt-BR';
+
 const CB = window.CREDITO_BC;
 const PALE = { PF:"#FF6200", PJ:"#2563eb", PJle:"#2e9c7f" };
-const vN = (x,d=1) => x==null ? "" : x.toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
+const vN = (x,d=1) => x==null ? "" : x.toLocaleString(LANG==='en'?'en-US':'pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
 
-document.getElementById("sub").textContent = `${CB.meta.de} a ${CB.meta.ate} · fonte: BC`;
-document.getElementById("foot").textContent =
-  `Fonte: Banco Central — Estatísticas monetárias e de crédito (recursos livres). Saldo/concessões em R$ milhões na origem; juros % a.a.; inadimplência = atrasos > 90 dias. Gerado em ${CB.meta.gerado_em}.`;
+document.getElementById("sub").textContent = t(`${CB.meta.de} a ${CB.meta.ate} · fonte: BC`, `${CB.meta.de} to ${CB.meta.ate} · source: Central Bank`);
+document.getElementById("foot").textContent = t(
+  `Fonte: Banco Central — Estatísticas monetárias e de crédito (recursos livres). Saldo/concessões em R$ milhões na origem; juros % a.a.; inadimplência = atrasos > 90 dias. Gerado em ${CB.meta.gerado_em}.`,
+  `Source: Central Bank — Monetary and credit statistics (non-earmarked funds). Balance/new lending in R$ millions at source; interest % p.a.; delinquency = arrears > 90 days. Generated on ${CB.meta.gerado_em}.`);
 
 // util: serie [ [ym,val], ... ] -> {labels, vals} com filtro de periodo e transform
 function prep(serie, nmeses, f=(v)=>v) {
@@ -159,7 +166,7 @@ function kpis() {
   const lastV = (s)=> s && s.length ? s.at(-1)[1] : null;
   const yoyV = (s)=> s && s.length>12 ? 100*(s.at(-1)[1]/s[s.length-13][1]-1) : null;
   const momV = (s)=> s && s.length>1 ? s.at(-1)[1]-s[s.length-2][1] : null;
-  const pp = (d)=> d==null?"":(d>0.005?"▲ +":d<-0.005?"▼ ":"● ")+vN(d,2)+" pp vs mês anterior";
+  const pp = (d)=> d==null?"":(d>0.005?"▲ +":d<-0.005?"▼ ":"● ")+vN(d,2)+t(" pp vs mês anterior"," pp vs previous month");
   const corPior = (d)=> d==null?"var(--muted)":(d>0.005?"var(--red)":d<-0.005?"var(--green)":"var(--muted)");
   const corCresc = (v)=> v==null?"var(--muted)":(v>0?"var(--green)":v<0?"var(--red)":"var(--muted)");
   const sinal = (v)=> v==null?"—":(v>=0?"+":"")+vN(v,1)+"%";
@@ -170,10 +177,10 @@ function kpis() {
   const iPF = lastV(CB.inadimplencia.PF_aq), iM = momV(CB.inadimplencia.PF_aq);
 
   const cards = [
-    { v:sinal(yPF), vc:corCresc(yPF), l:`Concessões PF auto — cresc. 12m (mês vs mês) · ${ate}` },
-    { v:sinal(yPJ), vc:corCresc(yPJ), l:`Concessões PJ auto — cresc. 12m (mês vs mês) · ${ate}` },
-    { v:vN(jPF,1)+"% a.a.", l:`Juros financiamento PF · ${ate}`, d:pp(jM), dc:corPior(jM) },
-    { v:vN(iPF,1)+"%", l:`Inadimplência PF · ${ate}`, d:pp(iM), dc:corPior(iM) },
+    { v:sinal(yPF), vc:corCresc(yPF), l:t(`Concessões PF auto — cresc. 12m (mês vs mês) · ${ate}`,`Individuals auto new lending — 12m growth (month vs month) · ${ate}`) },
+    { v:sinal(yPJ), vc:corCresc(yPJ), l:t(`Concessões PJ auto — cresc. 12m (mês vs mês) · ${ate}`,`Companies auto new lending — 12m growth (month vs month) · ${ate}`) },
+    { v:vN(jPF,1)+t("% a.a.","% p.a."), l:t(`Juros financiamento PF · ${ate}`,`Individuals financing interest rate · ${ate}`), d:pp(jM), dc:corPior(jM) },
+    { v:vN(iPF,1)+"%", l:t(`Inadimplência PF · ${ate}`,`Individuals delinquency · ${ate}`), d:pp(iM), dc:corPior(iM) },
   ];
   k.innerHTML = cards.map(c=>
     `<div class="kpi"><div class="v"${c.vc?` style="color:${c.vc}"`:""}>${c.v}</div><div class="l">${c.l}</div>`+
@@ -182,34 +189,38 @@ function kpis() {
 
 function render() {
   const n = +document.getElementById("periodo").value;
-  const rs = (v)=> "R$ "+vN(v,1)+" bi";
+  const rs = (v)=> "R$ "+vN(v,1)+t(" bi"," bn");
   const pct = (v)=> vN(v,1)+"%";
   const pctY = (v)=> (v>=0?"+":"")+vN(v,1)+"%";
+  const lblPF = t("PF financiamento","Individuals financing");
+  const lblPJ = t("PJ financiamento","Companies financing");
   // par de linhas PF/PJ (sem leasing)
   const par = (pf, pj, f) => [
-    ds("PF financiamento", prep(pf, n, f).vals, PALE.PF),
-    ds("PJ financiamento", prep(pj, n, f).vals, PALE.PJ),
+    ds(lblPF, prep(pf, n, f).vals, PALE.PF),
+    ds(lblPJ, prep(pj, n, f).vals, PALE.PJ),
   ];
 
   let p = prep(CB.saldo.PF_aq, n, bi);
-  line("cSaldo", par(CB.saldo.PF_aq, CB.saldo.PJ_aq, bi), p.labels, rs, "R$ bilhões");
+  line("cSaldo", par(CB.saldo.PF_aq, CB.saldo.PJ_aq, bi), p.labels, rs, t("R$ bilhões","R$ billions"));
 
   p = prep(CB.concessoes.PF_aq, n, bi);
-  line("cConc", par(CB.concessoes.PF_aq, CB.concessoes.PJ_aq, bi), p.labels, rs, "R$ bilhões/mês");
+  line("cConc", par(CB.concessoes.PF_aq, CB.concessoes.PJ_aq, bi), p.labels, rs, t("R$ bilhões/mês","R$ billions/month"));
 
   // Concessoes YoY
   const yp = prep(yoy(CB.concessoes.PF_aq), n);
   line("cConcYoY", [
-    ds("PF financiamento", yp.vals, PALE.PF),
-    ds("PJ financiamento", prep(yoy(CB.concessoes.PJ_aq), n).vals, PALE.PJ),
-  ], yp.labels, pctY, "% vs ano anterior");
+    ds(lblPF, yp.vals, PALE.PF),
+    ds(lblPJ, prep(yoy(CB.concessoes.PJ_aq), n).vals, PALE.PJ),
+  ], yp.labels, pctY, t("% vs ano anterior","% vs previous year"));
 
   p = prep(CB.juros.PF_aq, n);
-  line("cJuros", par(CB.juros.PF_aq, CB.juros.PJ_aq), p.labels, pct, "% a.a.");
+  line("cJuros", par(CB.juros.PF_aq, CB.juros.PJ_aq), p.labels, pct, t("% a.a.","% p.a."));
 
   p = prep(CB.inadimplencia.PF_aq, n);
-  line("cInad", par(CB.inadimplencia.PF_aq, CB.inadimplencia.PJ_aq), p.labels, pct, "% da carteira");
+  line("cInad", par(CB.inadimplencia.PF_aq, CB.inadimplencia.PJ_aq), p.labels, pct, t("% da carteira","% of loan book"));
 }
+
+if(LANG==='en'){ document.querySelectorAll('[data-en]').forEach(function(e){ e.innerHTML = e.getAttribute('data-en'); }); }
 
 document.getElementById("periodo").addEventListener("change", render);
 kpis();

@@ -15,6 +15,14 @@
 <script src="setores_news.js"></script>
 <script src="acoes.js"></script>
 <script src="precos.js"></script>
+<script>
+  // ===== i18n do hub (PT/EN) — idioma persiste em localStorage e propaga p/ iframes via ?lang =====
+  var HUBLANG = 'pt';
+  try { HUBLANG = (localStorage.getItem('hubLang') === 'en') ? 'en' : 'pt'; } catch (e) {}
+  function T(pt, en) { return HUBLANG === 'en' ? en : pt; }
+  function setHubLang(l) { try { localStorage.setItem('hubLang', l); } catch (e) {} location.reload(); }
+  document.documentElement.lang = HUBLANG === 'en' ? 'en' : 'pt-BR';
+</script>
 <style>
   :root {
     --black: #000000;
@@ -72,6 +80,16 @@
     transition: background .15s;
   }
   .logout-btn:hover { background: rgba(255,255,255,.10); }
+  .lang-toggle { display: inline-flex; border: 1px solid rgba(255,255,255,.25); border-radius: 6px; overflow: hidden; }
+  .lang-toggle button {
+    background: transparent; color: rgba(255,255,255,.7); border: none; cursor: pointer;
+    font-family: inherit; font-size: .7rem; font-weight: 700; padding: 5px 9px; letter-spacing: .3px;
+    transition: background .15s, color .15s;
+    display: inline-flex; align-items: center; gap: 5px; line-height: 1;
+  }
+  .lang-toggle button svg { display: block; box-shadow: 0 0 0 1px rgba(0,0,0,.15); }
+  .lang-toggle button:hover { background: rgba(255,255,255,.10); color: #fff; }
+  .lang-toggle button.on { background: var(--orange); color: #fff; }
 
   .layout {
     display: grid;
@@ -462,9 +480,13 @@
     <div class="logo-text">Transportation &amp; Capital Goods Hub</div>
   </div>
   <div class="topbar-right">
-    <button id="installBtn" class="logout-btn" style="display:none">⤓ Instalar app</button>
+    <div class="lang-toggle" title="Idioma / Language">
+      <button id="langPt" onclick="setHubLang('pt')" title="Português"><svg viewBox="0 0 28 20" width="17" height="12" style="border-radius:2px;flex:none"><rect width="28" height="20" fill="#009b3a"/><path d="M14 2.5 25.5 10 14 17.5 2.5 10Z" fill="#fedf00"/><circle cx="14" cy="10" r="4" fill="#002776"/></svg>PT</button>
+      <button id="langEn" onclick="setHubLang('en')" title="English"><svg viewBox="0 0 60 30" width="17" height="12" style="border-radius:2px;flex:none"><clipPath id="ukHub"><path d="M30,15 h30 v15 z v15 h-30 z h-30 v-15 z v-15 h30 z"/></clipPath><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="4" clip-path="url(#ukHub)"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></svg>EN</button>
+    </div>
+    <button id="installBtn" class="logout-btn" style="display:none" data-en="⤓ Install app">⤓ Instalar app</button>
     <span class="autores">Daniel Gasparete &middot; Gabriel Rezende &middot; Pedro Tineo</span>
-    <button class="logout-btn" onclick="doLogout()">Sair</button>
+    <button class="logout-btn" onclick="doLogout()" data-en="Sign out">Sair</button>
   </div>
 </div>
 <script>
@@ -501,8 +523,8 @@
 <button id="leftHandle" onclick="toggleLeft()" title="Mostrar/ocultar menu"></button>
 <button id="rightHandle" onclick="toggleRight()" title="Mostrar/ocultar painel (stocks + noticias)"></button>
 <script>
-  function _setR(off){ document.getElementById('rightHandle').textContent = off ? '❮ painel' : 'painel ❯'; }
-  function _setL(off){ document.getElementById('leftHandle').textContent = off ? 'menu ❯' : '❮ menu'; }
+  function _setR(off){ const w = T('painel','panel'); document.getElementById('rightHandle').textContent = off ? '❮ '+w : w+' ❯'; }
+  function _setL(off){ const w = T('menu','menu'); document.getElementById('leftHandle').textContent = off ? w+' ❯' : '❮ '+w; }
   function toggleRight(){
     const off = document.body.classList.toggle('right-off');
     try { localStorage.setItem('hubRightOff', off ? '1' : '0'); } catch(e){}
@@ -525,15 +547,15 @@
 <div class="layout">
 
   <aside class="nav">
-    <div class="nav-section">Inicio</div>
-    <div class="nav-item active" data-section="home"><span>Visao Geral</span></div>
+    <div class="nav-section" data-en="Home">Inicio</div>
+    <div class="nav-item active" data-section="home"><span data-en="Overview">Visao Geral</span></div>
 
     <div class="nav-section">Rental</div>
     <div class="nav-item" data-section="fenabrave" data-embed="https://TCG-Research.github.io/dashboard-fenabrave/"><span>Fenabrave</span></div>
     <div class="nav-item" data-section="fipe" data-embed="fipe.html"><span>FIPE</span></div>
     <div class="nav-item" data-section="cheatsheet" data-embed="cheat-sheet.html"><span>Cheat Sheet</span></div>
-    <div class="nav-item" data-section="credito-bc" data-embed="credito-bc.html"><span>Crédito BC (Auto)</span></div>
-    <div class="nav-item" data-section="seminovos" data-embed="seminovos-xray.html"><span>Seminovos X-Ray</span></div>
+    <div class="nav-item" data-section="credito-bc" data-embed="credito-bc.html"><span data-en="BC Credit (Auto)">Crédito BC (Auto)</span></div>
+    <div class="nav-item" data-section="seminovos" data-embed="seminovos-xray.html"><span data-en="Used Cars X-Ray">Seminovos X-Ray</span></div>
 
     <div class="nav-section">News</div>
     <div class="nav-item" data-section="news-feed" data-embed="https://TCG-Research.github.io/transcap-news/?embed=1"><span>Feed</span></div>
@@ -542,20 +564,20 @@
   <main>
     <div class="section active" id="sec-home">
       <div class="page-pad">
-        <div class="crumbs"><span class="current">Visao Geral</span></div>
+        <div class="crumbs"><span class="current" data-en="Overview">Visao Geral</span></div>
         <div class="page-head">
           <h1>Transportation &amp; Capital Goods Hub</h1>
-          <p>Painel central &middot; rental, logistica, aviacao, auto parts e capital goods. <em>Passe o mouse em qualquer ticker da direita pra ver detalhes.</em></p>
+          <p data-en="Central dashboard &middot; rental, logistics, airlines, auto parts and capital goods. <em>Hover over any ticker on the right for details.</em>">Painel central &middot; rental, logistica, aviacao, auto parts e capital goods. <em>Passe o mouse em qualquer ticker da direita pra ver detalhes.</em></p>
         </div>
 
         <div class="aviso-novidades" id="avisoNovidades" data-versao="2026-09-01">
           <div class="av-ico">&#128226;</div>
           <div class="av-body">
-            <div class="av-title">Novidades <span class="av-badge">Atualizado</span></div>
+            <div class="av-title"><span data-en="What's New">Novidades</span> <span class="av-badge" data-en="Updated">Atualizado</span></div>
             <ul>
-              <li><b>FIPE de setembro/2026</b> j&aacute; dispon&iacute;vel &middot; Top 50 e chineses atualizados (93 meses de hist&oacute;rico).</li>
-              <li><b>Cr&eacute;dito BC at&eacute; julho/2026</b> &middot; saldo, concess&otilde;es, juros e inadimpl&ecirc;ncia (PF e PJ).</li>
-              <li><b>Seminovos X-Ray no ar</b> &middot; raio-X de Localiza &times; Movida cruzados com a FIPE (pre&ccedil;o, km, marcas e desconto vs tabela).</li>
+              <li data-en="<b>September/2026 FIPE</b> available &middot; Top 50 and Chinese brands updated (93 months of history)."><b>FIPE de setembro/2026</b> j&aacute; dispon&iacute;vel &middot; Top 50 e chineses atualizados (93 meses de hist&oacute;rico).</li>
+              <li data-en="<b>BC Credit through July/2026</b> &middot; balance, new lending, rates and delinquency (individuals and companies)."><b>Cr&eacute;dito BC at&eacute; julho/2026</b> &middot; saldo, concess&otilde;es, juros e inadimpl&ecirc;ncia (PF e PJ).</li>
+              <li data-en="<b>Used Cars X-Ray live</b> &middot; Localiza &times; Movida cross-referenced with FIPE (price, km, brands and discount vs table)."><b>Seminovos X-Ray no ar</b> &middot; raio-X de Localiza &times; Movida cruzados com a FIPE (pre&ccedil;o, km, marcas e desconto vs tabela).</li>
             </ul>
           </div>
           <button class="av-close" id="avisoClose" aria-label="Fechar aviso" title="Fechar">&times;</button>
@@ -565,38 +587,38 @@
           <div class="seg-card rental live" onclick="showSection('fenabrave')">
             <div class="seg-tag">Rental</div>
             <h4>Fenabrave</h4>
-            <p>Emplacamentos mensais, marcas, chineses e eletrificados.</p>
-            <span class="seg-status">No ar</span>
+            <p data-en="Monthly registrations, brands, Chinese and electrified.">Emplacamentos mensais, marcas, chineses e eletrificados.</p>
+            <span class="seg-status" data-en="Live">No ar</span>
           </div>
           <div class="seg-card rental live" onclick="showSection('seminovos')">
             <div class="seg-tag">Rental</div>
-            <h4>Seminovos X-Ray</h4>
-            <p>Localiza &times; Movida cruzados com a FIPE &middot; pre&ccedil;o, km, marcas.</p>
-            <span class="seg-status">No ar</span>
+            <h4 data-en="Used Cars X-Ray">Seminovos X-Ray</h4>
+            <p data-en="Localiza &times; Movida cross-referenced with FIPE &middot; price, km, brands.">Localiza &times; Movida cruzados com a FIPE &middot; pre&ccedil;o, km, marcas.</p>
+            <span class="seg-status" data-en="Live">No ar</span>
           </div>
           <div class="seg-card rental live" onclick="showSection('fipe')">
             <div class="seg-tag">Rental</div>
             <h4>FIPE</h4>
-            <p>Depreciacao e spread novo vs seminovo &middot; Top 50.</p>
-            <span class="seg-status">No ar</span>
+            <p data-en="Depreciation and new vs used spread &middot; Top 50.">Depreciacao e spread novo vs seminovo &middot; Top 50.</p>
+            <span class="seg-status" data-en="Live">No ar</span>
           </div>
           <div class="seg-card rental live" onclick="showSection('cheatsheet')">
             <div class="seg-tag">Rental</div>
             <h4>Cheat Sheet</h4>
-            <p>Resumo em graficos &middot; Localiza, Movida, Unidas, LM.</p>
-            <span class="seg-status">No ar</span>
+            <p data-en="Chart summary &middot; Localiza, Movida, Unidas, LM.">Resumo em graficos &middot; Localiza, Movida, Unidas, LM.</p>
+            <span class="seg-status" data-en="Live">No ar</span>
           </div>
           <div class="seg-card rental live" onclick="showSection('credito-bc')">
             <div class="seg-tag">Rental</div>
-            <h4>Crédito BC (Auto)</h4>
-            <p>Saldo, concessoes, juros e inadimplencia &middot; PF e PJ.</p>
-            <span class="seg-status">No ar</span>
+            <h4 data-en="BC Credit (Auto)">Crédito BC (Auto)</h4>
+            <p data-en="Balance, new lending, rates and delinquency &middot; individuals and companies.">Saldo, concessoes, juros e inadimplencia &middot; PF e PJ.</p>
+            <span class="seg-status" data-en="Live">No ar</span>
           </div>
           <div class="seg-card news live" onclick="showSection('news-feed')">
             <div class="seg-tag">News</div>
             <h4>TransCap News</h4>
-            <p>Curadoria de noticias por setor (Rental, Concessoes, Airlines, Cap Goods).</p>
-            <span class="seg-status">No ar</span>
+            <p data-en="Curated news by sector (Rental, Concessions, Airlines, Cap Goods).">Curadoria de noticias por setor (Rental, Concessoes, Airlines, Cap Goods).</p>
+            <span class="seg-status" data-en="Live">No ar</span>
           </div>
         </div>
 
@@ -605,32 +627,32 @@
     </div>
 
     <div class="section embed" id="sec-fenabrave">
-      <div class="embed-loading" id="loading-fenabrave">Carregando dashboard Fenabrave...</div>
+      <div class="embed-loading" id="loading-fenabrave" data-en="Loading Fenabrave dashboard...">Carregando dashboard Fenabrave...</div>
       <iframe class="embed-frame" id="frame-fenabrave" style="display:none" onload="onEmbedLoaded('fenabrave')"></iframe>
     </div>
 
     <div class="section embed" id="sec-seminovos">
-      <div class="embed-loading" id="loading-seminovos">Carregando Seminovos X-Ray...</div>
+      <div class="embed-loading" id="loading-seminovos" data-en="Loading Used Cars X-Ray...">Carregando Seminovos X-Ray...</div>
       <iframe class="embed-frame" id="frame-seminovos" style="display:none" onload="onEmbedLoaded('seminovos')"></iframe>
     </div>
 
     <div class="section embed" id="sec-fipe">
-      <div class="embed-loading" id="loading-fipe">Carregando FIPE...</div>
+      <div class="embed-loading" id="loading-fipe" data-en="Loading FIPE...">Carregando FIPE...</div>
       <iframe class="embed-frame" id="frame-fipe" style="display:none" onload="onEmbedLoaded('fipe')"></iframe>
     </div>
 
     <div class="section embed" id="sec-cheatsheet">
-      <div class="embed-loading" id="loading-cheatsheet">Carregando Cheat Sheet...</div>
+      <div class="embed-loading" id="loading-cheatsheet" data-en="Loading Cheat Sheet...">Carregando Cheat Sheet...</div>
       <iframe class="embed-frame" id="frame-cheatsheet" style="display:none" onload="onEmbedLoaded('cheatsheet')"></iframe>
     </div>
 
     <div class="section embed" id="sec-credito-bc">
-      <div class="embed-loading" id="loading-credito-bc">Carregando Crédito BC...</div>
+      <div class="embed-loading" id="loading-credito-bc" data-en="Loading BC Credit...">Carregando Crédito BC...</div>
       <iframe class="embed-frame" id="frame-credito-bc" style="display:none" onload="onEmbedLoaded('credito-bc')"></iframe>
     </div>
 
     <div class="section embed" id="sec-news-feed">
-      <div class="embed-loading" id="loading-news-feed">Carregando TransCap News...</div>
+      <div class="embed-loading" id="loading-news-feed" data-en="Loading TransCap News...">Carregando TransCap News...</div>
       <iframe class="embed-frame" id="frame-news-feed" style="display:none" onload="onEmbedLoaded('news-feed')"></iframe>
     </div>
 
@@ -651,8 +673,8 @@
     <div class="right-half">
       <div class="panel-block">
         <div class="panel-title">
-          <span>Ultimas Noticias</span>
-          <span class="sub">setores &middot; últimas 24h</span>
+          <span data-en="Latest News">Ultimas Noticias</span>
+          <span class="sub" data-en="sectors &middot; last 24h">setores &middot; últimas 24h</span>
         </div>
       </div>
       <div id="news-list"></div>
@@ -691,7 +713,7 @@
   let NEWS = []; // populado por fetchNews()
   let newsLoaded = false;
   const JANELA_NOTICIAS_MS = 24 * 60 * 60 * 1000; // ultimas 24h
-  const SECTOR_LABEL = { rental:"Rental", concessions:"Concessões", airlines:"Airlines", capgoods:"Cap Goods" };
+  const SECTOR_LABEL = { rental:"Rental", concessions: T("Concessões","Concessions"), airlines:"Airlines", capgoods:"Cap Goods" };
   function sectorChip(id){
     const s = (typeof SECTORS !== "undefined") ? SECTORS.find(x => x.id === id) : null;
     const cor = s ? s.color : "#888";
@@ -701,10 +723,10 @@
   function timeAgo(ms){
     if(!ms) return "";
     const diff = (Date.now() - ms) / 60000;
-    if(diff < 1) return "Agora";
+    if(diff < 1) return T("Agora","Now");
     if(diff < 60) return Math.round(diff) + " min";
     if(diff < 1440) return Math.round(diff/60) + " h";
-    return new Date(ms).toLocaleDateString("pt-BR", {day: "2-digit", month: "2-digit"});
+    return new Date(ms).toLocaleDateString(HUBLANG === 'en' ? "en-US" : "pt-BR", {day: "2-digit", month: "2-digit"});
   }
 
   async function fetchNews(){
@@ -746,7 +768,7 @@
       console.warn("Falha ao buscar news.json:", e);
       const el = document.getElementById("news-list");
       if(el && !NEWS.length) {
-        el.innerHTML = '<div style="padding:18px;text-align:center;color:#888;font-size:.78rem;">Nao foi possivel carregar as noticias.<br><a href="https://TCG-Research.github.io/transcap-news/" target="_blank" style="color:#FF6200">Abrir TransCap News &rarr;</a></div>';
+        el.innerHTML = '<div style="padding:18px;text-align:center;color:#888;font-size:.78rem;">' + T('Nao foi possivel carregar as noticias.','Could not load the news.') + '<br><a href="https://TCG-Research.github.io/transcap-news/" target="_blank" style="color:#FF6200">' + T('Abrir TransCap News','Open TransCap News') + ' &rarr;</a></div>';
       }
     }
   }
@@ -789,7 +811,9 @@
     A.setores.forEach(setor => {
       const items = A.empresas.filter(e => e.setor === setor);
       if(!items.length) return;
-      html += '<div class="sector-head">' + setor + '</div>';
+      const STOCK_SETOR_EN = { "Logística":"Logistics", "Aviação":"Airlines", "Serviços":"Services" };
+      const setorLabel = HUBLANG === 'en' ? (STOCK_SETOR_EN[setor] || setor) : setor;
+      html += '<div class="sector-head">' + setorLabel + '</div>';
       items.forEach(e => {
         const m = multiplos(e, PRECOS[e.ticker]);
         const upDown = m.chg >= 0 ? "up" : "down";
@@ -819,8 +843,8 @@
     const el = document.getElementById('news-list');
     if(!NEWS.length){
       el.innerHTML = newsLoaded
-        ? '<div style="padding:18px;text-align:center;color:#888;font-size:.78rem;">Sem notícias nas últimas 24h.<br><a href="https://TCG-Research.github.io/transcap-news/" target="_blank" style="color:#FF6200">Ver feed completo &rarr;</a></div>'
-        : '<div style="padding:18px;text-align:center;color:#888;font-size:.8rem;">Carregando noticias...</div>';
+        ? '<div style="padding:18px;text-align:center;color:#888;font-size:.78rem;">' + T('Sem notícias nas últimas 24h.','No news in the last 24h.') + '<br><a href="https://TCG-Research.github.io/transcap-news/" target="_blank" style="color:#FF6200">' + T('Ver feed completo','See full feed') + ' &rarr;</a></div>'
+        : '<div style="padding:18px;text-align:center;color:#888;font-size:.8rem;">' + T('Carregando noticias...','Loading news...') + '</div>';
       return;
     }
     el.innerHTML = NEWS.map(n => {
@@ -908,21 +932,21 @@
         '<span class="popup-price">' + fmtPrice(m.preco, m.moeda === 'USD' ? 'USD' : 'BRL') + '</span>' +
         '<span class="popup-chg ' + upDown + '">' + fmtChg(m.chg) + '</span>' +
       '</div>' +
-      '<div class="popup-section">Múltiplos</div>' +
+      '<div class="popup-section">' + T('Múltiplos','Multiples') + '</div>' +
       '<div class="popup-grid">' +
         '<div class="popup-cell">P/E 2026E <b>' + fx(m.pe26) + '</b></div>' +
         '<div class="popup-cell">P/E 2027E <b>' + fx(m.pe27) + '</b></div>' +
         '<div class="popup-cell">EV/EBITDA 2026E <b>' + fx(m.evb26) + '</b></div>' +
         '<div class="popup-cell">EV/EBITDA 2027E <b>' + fx(m.evb27) + '</b></div>' +
       '</div>' +
-      '<div class="popup-section">Performance 12M vs IBOV</div>' +
+      '<div class="popup-section">' + T('Performance 12M vs IBOV','12M Performance vs IBOV') + '</div>' +
       (temChart
         ? '<div class="popup-chart-wrap">' + buildSVGChart(stockSeries, ibov) + '</div>' +
           '<div class="popup-legend">' +
             '<span><span class="swatch" style="background:#FF6200"></span>' + e.ticker + ' ' + retTxt(stockSeries) + '</span>' +
             '<span><span class="swatch" style="background:#999"></span>IBOV ' + retTxt(ibov) + '</span>' +
           '</div>'
-        : '<div class="popup-note">Sem histórico disponível.</div>');
+        : '<div class="popup-note">' + T('Sem histórico disponível.','No history available.') + '</div>');
     popupEl.classList.add('show');
 
     const r = rowEl.getBoundingClientRect();
@@ -951,7 +975,12 @@
     const embedUrl = nav && nav.dataset.embed;
     if(embedUrl && !loadedFrames.has(id)){
       const frame = document.getElementById('frame-' + id);
-      if(frame){ frame.src = embedUrl; loadedFrames.add(id); }
+      if(frame){
+        // propaga o idioma do hub p/ o dashboard embutido (notícias ficam em PT)
+        let url = embedUrl;
+        if(id !== 'news-feed'){ url += (url.indexOf('?') >= 0 ? '&' : '?') + 'lang=' + HUBLANG; }
+        frame.src = url; loadedFrames.add(id);
+      }
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -1004,6 +1033,16 @@
       el.style.display = 'none';
       try { localStorage.setItem('hubAviso', v); } catch(e){}
     });
+  })();
+
+  // ===== aplica o idioma: troca elementos [data-en] p/ inglês + marca o toggle ativo =====
+  (function(){
+    if(HUBLANG === 'en'){
+      document.querySelectorAll('[data-en]').forEach(function(e){ e.innerHTML = e.getAttribute('data-en'); });
+    }
+    var lp = document.getElementById('langPt'), le = document.getElementById('langEn');
+    if(lp) lp.classList.toggle('on', HUBLANG !== 'en');
+    if(le) le.classList.toggle('on', HUBLANG === 'en');
   })();
 </script>
 
