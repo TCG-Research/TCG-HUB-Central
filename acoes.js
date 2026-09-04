@@ -1,4 +1,4 @@
-// Fundamentos das companhias (Comps Table 12/08/2026). Valores em R$ milhões; ações em milhões.
+// Fundamentos das companhias (Comps Table 04/09/2026 (Rumo/GPS/Embraer atualizados)). Valores em R$ milhões; ações em milhões.
 // O preço vem ao vivo (precos.js / Yahoo). Multiplos calculados no hub:
 //   Market Cap   = preco * acoes
 //   P/E (ano)    = Market Cap / lucro_liquido (ano)
@@ -6,7 +6,7 @@
 //   EV/EBITDA(ano) = EV / EBITDA (ano)
 // preco_ref = preço da tabela (fallback se o feed de preço falhar). moeda p/ exibicao.
 window.ACOES = {
-  meta: { atualizado: "2026-08-12", obs: "R$ mm; ações mm; EV usa Dív.Líq. 2026 + minoritários" },
+  meta: { atualizado: "2026-09-04", obs: "R$ mm; ações mm; EV usa Dív.Líq. 2026 + minoritários" },
   setores: ["Rental", "Logística", "Aviação", "Auto Parts", "Capital Goods", "Serviços"],
   empresas: [
     // --- Rental ---
@@ -15,14 +15,14 @@ window.ACOES = {
     { ticker:"VAMO3", nome:"Vamos", setor:"Rental", yahoo:"VAMO3.SA", moeda:"BRL", acoes:1222, preco_ref:2.8, ll26:461, ll27:701, ebitda26:3893, ebitda27:4146, divliq26:12140, divliq27:12085, minor:0 },
     { ticker:"ARML3", nome:"Armac", setor:"Rental", yahoo:"ARML3.SA", moeda:"BRL", acoes:346, preco_ref:2.7, ll26:179, ll27:273, ebitda26:880, ebitda27:964, divliq26:2220, divliq27:1838, minor:0 },
     // --- Logística ---
-    { ticker:"RAIL3", nome:"Rumo", setor:"Logística", yahoo:"RAIL3.SA", moeda:"BRL", acoes:1856, preco_ref:13.05, ll26:2093, ll27:1793, ebitda26:8150, ebitda27:8844, divliq26:18012, divliq27:19575, minor:0 },
+    { ticker:"RAIL3", nome:"Rumo", setor:"Logística", yahoo:"RAIL3.SA", moeda:"BRL", acoes:1856, preco_ref:13.05, ll26:1926, ll27:2587, ebitda26:8160, ebitda27:9027, divliq26:18012, divliq27:19575, minor:0 },
     { ticker:"HBSA3", nome:"Hidrovias do Brasil", setor:"Logística", yahoo:"HBSA3.SA", moeda:"BRL", acoes:1360, preco_ref:3.2, ll26:360, ll27:560, ebitda26:1142, ebitda27:1418, divliq26:1622, divliq27:1049, minor:0 },
     { ticker:"ECOR3", nome:"Ecorodovias", setor:"Logística", yahoo:"ECOR3.SA", moeda:"BRL", acoes:696, preco_ref:6.14, ll26:516, ll27:464, ebitda26:5577, ebitda27:5945, divliq26:24174, divliq27:27172, minor:0 },
     { ticker:"JSLG3", nome:"JSL", setor:"Logística", yahoo:"JSLG3.SA", moeda:"BRL", acoes:286, preco_ref:4.78, ll26:82, ll27:249, ebitda26:1879, ebitda27:2364, divliq26:7348, divliq27:6911, minor:0 },
     { ticker:"TGMA3", nome:"Tegma", setor:"Logística", yahoo:"TGMA3.SA", moeda:"BRL", acoes:66, preco_ref:33.45, ll26:267, ll27:280, ebitda26:419, ebitda27:436, divliq26:-133, divliq27:-161, minor:0 },
     // --- Aviação ---
     { ticker:"LTM", nome:"Latam Airlines", setor:"Aviação", yahoo:"LTM", moeda:"USD", acoes:287, preco_ref:52.6, ll26:1834, ll27:1800, ebitda26:4728, ebitda27:4903, divliq26:5199, divliq27:4384, minor:0 },
-    { ticker:"EMBJ", nome:"Embraer", setor:"Aviação", yahoo:"EMBJ", moeda:"USD", acoes:181, preco_ref:74.53, ll26:543, ll27:696, ebitda26:1078, ebitda27:1249, divliq26:-28, divliq27:-234, minor:0 },
+    { ticker:"EMBJ", nome:"Embraer", setor:"Aviação", yahoo:"EMBJ", moeda:"USD", acoes:181, preco_ref:74.53, ll26:633, ll27:790, ebitda26:1153, ebitda27:1298, divliq26:-226, divliq27:-510, minor:0 },
     // --- Auto Parts ---
     { ticker:"LEVE3", nome:"Mahle Metal Leve", setor:"Auto Parts", yahoo:"LEVE3.SA", moeda:"BRL", acoes:136, preco_ref:31.39, ll26:624, ll27:696, ebitda26:1148, ebitda27:1211, divliq26:428, divliq27:431, minor:0 },
     { ticker:"MYPK3", nome:"Iochpe-Maxion", setor:"Auto Parts", yahoo:"MYPK3.SA", moeda:"BRL", acoes:154, preco_ref:9.07, ll26:269, ll27:332, ebitda26:1688, ebitda27:1820, divliq26:3521, divliq27:3634, minor:1973 },
@@ -33,7 +33,7 @@ window.ACOES = {
     // --- Capital Goods ---
     { ticker:"WEGE3", nome:"WEG", setor:"Capital Goods", yahoo:"WEGE3.SA", moeda:"BRL", acoes:4196, preco_ref:47.62, ll26:6403, ll27:7265, ebitda26:9027, ebitda27:10305, divliq26:-4027, divliq27:-6350, minor:0 },
     // --- Serviços ---
-    { ticker:"GGPS3", nome:"GPS", setor:"Serviços", yahoo:"GGPS3.SA", moeda:"BRL", acoes:752, preco_ref:11.2, ll26:886, ll27:1105, ebitda26:2081, ebitda27:2414, divliq26:2377, divliq27:2083, minor:0 },
+    { ticker:"GGPS3", nome:"GPS", setor:"Serviços", yahoo:"GGPS3.SA", moeda:"BRL", acoes:752, preco_ref:11.2, ll26:854, ll27:1019, ebitda26:2239, ebitda27:2222, divliq26:2377, divliq27:2083, minor:0 },
     { ticker:"PRNR3", nome:"Priner", setor:"Serviços", yahoo:"PRNR3.SA", moeda:"BRL", acoes:57, preco_ref:16.72, ll26:80, ll27:135, ebitda26:370, ebitda27:446, divliq26:640, divliq27:648, minor:0 },
   ],
 };
