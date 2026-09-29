@@ -556,6 +556,7 @@
     <div class="nav-item" data-section="cheatsheet" data-embed="cheat-sheet.html"><span>Cheat Sheet</span></div>
     <div class="nav-item" data-section="credito-bc" data-embed="credito-bc.html"><span data-en="BC Credit (Auto)">Crédito BC (Auto)</span></div>
     <div class="nav-item" data-section="seminovos" data-embed="seminovos-xray.html"><span data-en="Used Cars X-Ray">Seminovos X-Ray</span></div>
+    <div class="nav-item" data-section="frota" data-embed="frota_circulante.html"><span data-en="Fleet in Circulation">Frota Circulante</span></div>
 
     <div class="nav-section">News</div>
     <div class="nav-item" data-section="news-feed" data-embed="https://TCG-Research.github.io/transcap-news/?embed=1"><span>Feed</span></div>
@@ -575,6 +576,7 @@
           <div class="av-body">
             <div class="av-title"><span data-en="What's New">Novidades</span> <span class="av-badge" data-en="Updated">Atualizado</span></div>
             <ul>
+              <li data-en="<b>Fleet in Circulation live</b> &middot; registered fleet by state, model and age (RENAVAM) + monthly sales proxy validated vs Fenabrave (0.97 correlation)."><b>Frota Circulante no ar</b> &middot; frota por estado, modelo e idade (RENAVAM) + proxy de vendas mensais validado vs Fenabrave (correla&ccedil;&atilde;o 0,97).</li>
               <li data-en="<b>September/2026 FIPE</b> available &middot; Top 50 and Chinese brands updated (93 months of history)."><b>FIPE de setembro/2026</b> j&aacute; dispon&iacute;vel &middot; Top 50 e chineses atualizados (93 meses de hist&oacute;rico).</li>
               <li data-en="<b>BC Credit through July/2026</b> &middot; balance, new lending, rates and delinquency (individuals and companies)."><b>Cr&eacute;dito BC at&eacute; julho/2026</b> &middot; saldo, concess&otilde;es, juros e inadimpl&ecirc;ncia (PF e PJ).</li>
               <li data-en="<b>Used Cars X-Ray live</b> &middot; Localiza &times; Movida cross-referenced with FIPE (price, km, brands and discount vs table)."><b>Seminovos X-Ray no ar</b> &middot; raio-X de Localiza &times; Movida cruzados com a FIPE (pre&ccedil;o, km, marcas e desconto vs tabela).</li>
@@ -588,6 +590,12 @@
             <div class="seg-tag">Rental</div>
             <h4>Fenabrave</h4>
             <p data-en="Monthly registrations, brands, Chinese and electrified.">Emplacamentos mensais, marcas, chineses e eletrificados.</p>
+            <span class="seg-status" data-en="Live">No ar</span>
+          </div>
+          <div class="seg-card rental live" onclick="showSection('frota')">
+            <div class="seg-tag">Rental</div>
+            <h4 data-en="Fleet in Circulation">Frota Circulante</h4>
+            <p data-en="Registered fleet by state, model and age &middot; RENAVAM &middot; monthly sales proxy.">Frota por estado, modelo e idade &middot; RENAVAM &middot; proxy de vendas mensais.</p>
             <span class="seg-status" data-en="Live">No ar</span>
           </div>
           <div class="seg-card rental live" onclick="showSection('seminovos')">
@@ -634,6 +642,11 @@
     <div class="section embed" id="sec-seminovos">
       <div class="embed-loading" id="loading-seminovos" data-en="Loading Used Cars X-Ray...">Carregando Seminovos X-Ray...</div>
       <iframe class="embed-frame" id="frame-seminovos" style="display:none" onload="onEmbedLoaded('seminovos')"></iframe>
+    </div>
+
+    <div class="section embed" id="sec-frota">
+      <div class="embed-loading" id="loading-frota" data-en="Loading Fleet in Circulation...">Carregando Frota Circulante...</div>
+      <iframe class="embed-frame" id="frame-frota" style="display:none" onload="onEmbedLoaded('frota')"></iframe>
     </div>
 
     <div class="section embed" id="sec-fipe">
